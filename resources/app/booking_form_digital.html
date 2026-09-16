@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نموذج طلب حجز - نظام إتقان</title>
+    <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #818cf8;
+            --primary-dark: #3730a3;
+            --secondary: #0ea5e9;
+            --bg-body: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Readex Pro', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding-bottom: 50px;
+        }
+
+        /* Header Styling */
+        header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+            color: white;
+            padding: 50px 20px;
+            text-align: center;
+            margin-bottom: -70px;
+            padding-bottom: 110px;
+            position: relative;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: linear-gradient(to top, var(--bg-body), transparent);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            letter-spacing: -0.5px;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        .form-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+            padding: 45px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Section Styling */
+        .section {
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 30px;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            color: var(--primary);
+        }
+
+        .section-header i {
+            font-size: 1.5rem;
+            background: rgba(79, 70, 229, 0.1);
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+        }
+
+        .section-header h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+
+        /* Input Styling */
+        .field {
+            margin-bottom: 15px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="tel"],
+        input[type="date"],
+        input[type="time"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        /* Custom Radio/Checkbox */
+        .options-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            margin-top: 10px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-main);
+            transition: all 0.2s ease;
+        }
+
+        .option-item:hover {
+            color: var(--primary);
+        }
+
+        .option-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary);
+            cursor: pointer;
+            order: 2; /* Puts checkbox on the left in RTL if text is first, but since we are RTL it depends on markup */
+        }
+
+        /* Alert Boxes */
+        .alert-box {
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-right: 5px solid;
+        }
+
+        .alert-warning {
+            background: #fffbeb;
+            border-color: var(--warning);
+            color: #92400e;
+        }
+
+        .alert-info {
+            background: #eff6ff;
+            border-color: var(--info);
+            color: #1e40af;
+        }
+
+        .alert-danger {
+            background: #fef2f2;
+            border-color: var(--danger);
+            color: #991b1b;
+        }
+
+        .alert-box h4 {
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .alert-box p {
+            font-size: 0.85rem;
+            line-height: 1.7;
+        }
+
+        /* Agreement Section */
+        .agreement {
+            text-align: center;
+            padding: 20px;
+            background: rgba(16, 185, 129, 0.05);
+            border: 2px solid rgba(16, 185, 129, 0.2);
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+
+        .agreement-checkbox {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Button Styling */
+        .btn-submit {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            padding: 18px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(16, 185, 129, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .btn-submit:disabled {
+            background: #cbd5e1;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .btn-word {
+            background: #2563eb;
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-word:hover:not(:disabled) {
+            box-shadow: 0 15px 30px rgba(37, 99, 235, 0.4);
+            filter: brightness(1.1);
+        }
+
+        @media print {
+            header, .agreement, .btn-submit, #pdf-btn, #word-btn, button, .alert-box {
+                display: none !important;
+            }
+            body { 
+                background: white !important; 
+                padding: 5mm 10mm !important; 
+                font-family: 'Readex Pro', sans-serif !important; 
+                color: #0f172a !important;
+            }
+            .form-card { 
+                box-shadow: none !important; 
+                padding: 0 !important; 
+                border: none !important; 
+            }
+            .container { 
+                max-width: 100% !important; 
+                padding: 0 !important; 
+            }
+            .section {
+                margin-bottom: 16px !important;
+                page-break-inside: avoid !important;
+            }
+            .section-header {
+                border-bottom: 2px solid #2563eb !important;
+                margin-bottom: 12px !important;
+                padding-bottom: 5px !important;
+            }
+            .section-header h2 {
+                font-size: 1.1rem !important;
+                color: #1e3a8a !important;
+            }
+            .grid {
+                gap: 10px !important;
+            }
+            .field label {
+                font-size: 0.85rem !important;
+                font-weight: bold !important;
+                color: #1e293b !important;
+                margin-bottom: 4px !important;
+            }
+            .input-wrapper i {
+                display: none !important;
+            }
+            .input-wrapper {
+                border: none !important;
+                background: transparent !important;
+            }
+            input[type="text"], input[type="tel"], input[type="date"], input[type="number"], select, textarea {
+                border: none !important;
+                border-bottom: 1.5px dashed #475569 !important;
+                border-radius: 0 !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                color: transparent !important;
+                font-size: 0.9rem !important;
+                padding: 2px 4px !important;
+                height: 30px !important;
+                appearance: none !important;
+                -webkit-appearance: none !important;
+            }
+            input::placeholder, textarea::placeholder {
+                opacity: 0 !important;
+                color: transparent !important;
+            }
+            input::-webkit-calendar-picker-indicator, input::-webkit-inner-spin-button, input::-webkit-outer-spin-button {
+                display: none !important;
+                opacity: 0 !important;
+            }
+            input[type="checkbox"] {
+                appearance: none !important;
+                -webkit-appearance: none !important;
+                width: 16px !important;
+                height: 16px !important;
+                border: 1.5px solid #334155 !important;
+                border-radius: 3px !important;
+                background: white !important;
+                display: inline-block !important;
+                margin-left: 6px !important;
+                vertical-align: middle !important;
+            }
+            .option-item {
+                border: 1px solid #e2e8f0 !important;
+                background: #fafafa !important;
+                padding: 5px 8px !important;
+                font-size: 0.85rem !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <h1>نموذج طلب حجز</h1>
+            <p>يرجى تعبئة البيانات ثم تصدير الملف لإرساله للمسؤول</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <form id="booking-form-official" class="form-card">
+            
+            <!-- Section 1 -->
+            <div class="section">
+                <div class="section-header">
+                    <i class="fas fa-building"></i>
+                    <h2>بيانات الجهة والمنسق</h2>
+                </div>
+                <div class="grid">
+                    <div class="field">
+                        <label>نوع الجهة</label>
+                        <select name="entity-type">
+                            <option value="dept">إدارة / قسم / وحدة</option>
+                            <option value="sect">جهة تعليمية</option>
+                            <option value="unit">جهة وزارية</option>
+                            <option value="other">أخرى</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>اسم الجهة</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-university"></i>
+                            <input type="text" name="entity-name" placeholder="مثال: قسم الاتصال المؤسسي" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>مسؤول التنسيق</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user"></i>
+                            <input type="text" name="coord-name" placeholder="الاسم الثلاثي" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>رقم الجوال</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-phone"></i>
+                            <input type="tel" name="coord-mobile" placeholder="05XXXXXXXX" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2 -->
+            <div class="section">
+                <div class="section-header">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h2>توقيت ومقر الفعالية</h2>
+                </div>
+                <div class="field">
+                    <label style="font-size: 1.1rem; margin-bottom: 15px;">المقر المطلوب</label>
+                    <div class="options-group" id="venue-checkboxes-container">
+                        <!-- THE MAIN APP WILL INJECT ROOMS HERE -->
+                        <label class="option-item">قاعة المركز العلمي <input type="checkbox" name="venue" value="1"></label>
+                        <label class="option-item">مجلس بيت الطالب <input type="checkbox" name="venue" value="2"></label>
+                        <label class="option-item">مسرح التربية الخاصة بنين <input type="checkbox" name="venue" value="3"></label>
+                        <label class="option-item">مسرح التربية الخاصة بنات <input type="checkbox" name="venue" value="4"></label>
+                        <label class="option-item">مسرح إدارة التعليم <input type="checkbox" name="venue" value="5"></label>
+                        <label class="option-item">قاعة الشؤون التعليمية <input type="checkbox" name="venue" value="6"></label>
+                    </div>
+                </div>
+                <div class="grid">
+                    <div class="field">
+                        <label>من تاريخ (بداية الفعالية)</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-calendar-day"></i>
+                            <input type="date" name="date" id="digital-start-date" required onchange="calcDigitalDays()">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>إلى تاريخ (نهاية الفعالية)</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-calendar-check"></i>
+                            <input type="date" name="end-date" id="digital-end-date" required onchange="calcDigitalDays()">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>عدد الأيام الإجمالي</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-calendar-week"></i>
+                            <input type="number" name="days-count" id="digital-days-count" value="1" min="1" onchange="calcDigitalEndDateFromDays()">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>فئة الحضور</label>
+                        <select name="audience-gender">
+                            <option value="boys">بنين</option>
+                            <option value="girls">بنات</option>
+                            <option value="mixed">عام</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>مدة الفعالية (ساعات)</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-clock"></i>
+                            <input type="number" name="duration" placeholder="مثال: 3">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>الفترة</label>
+                        <select name="period">
+                            <option value="morning">صباحاً</option>
+                            <option value="evening">مساءً</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>الساعة</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-clock"></i>
+                            <input type="time" name="start-time" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3 -->
+            <div class="section">
+                <div class="section-header">
+                    <i class="fas fa-info-circle"></i>
+                    <h2>تفاصيل الفعالية</h2>
+                </div>
+                <div class="field">
+                    <label>مسمى الفعالية</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-heading"></i>
+                        <input type="text" name="event-title" placeholder="أدخل اسم الفعالية الرسمي" required>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>نوع الفعالية</label>
+                    <div class="options-group" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; border-style: solid; border-width: 1px; background: #f8fafc;">
+                        <label class="option-item"><input type="checkbox" name="event-types" value="visit"> زيارة وفد</label>
+                        <label class="option-item"><input type="checkbox" name="event-types" value="meeting"> لقاء</label>
+                        <label class="option-item"><input type="checkbox" name="event-types" value="ministerial"> برنامج وزاري</label>
+                        <label class="option-item"><input type="checkbox" name="event-types" value="internal"> برنامج داخلي</label>
+                        <label class="option-item"><input type="checkbox" name="event-types" value="workshop"> ورشة عمل</label>
+                        <label class="option-item"><input type="checkbox" name="event-types" value="opening"> افتتاح</label>
+                        <label class="option-item"><input type="checkbox" name="event-types" value="party"> حفل</label>
+                        <label class="option-item" style="grid-column: span 2; display: flex; align-items: center; gap: 10px; background: #f8fafc; border: 1px dashed var(--primary-light); padding: 10px; border-radius: 8px;">
+                            <input type="checkbox" name="event-types" value="other" id="event-types-other-checkbox" onchange="toggleOtherEventTypeInput()">
+                            <span style="white-space: nowrap;">أخرى:</span>
+                            <input type="text" id="other-event-type-name" placeholder="اكتب هنا..." style="flex-grow: 1; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.9rem;">
+                        </label>
+                    </div>
+                </div>
+                <div class="grid">
+                    <div class="field">
+                        <label>الضيف / الراعي</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-star"></i>
+                            <input type="text" name="vip-guest" placeholder="اختياري">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>الفعاليات المصاحبة</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-tasks"></i>
+                            <input type="text" name="activities" placeholder="مثال: معرض، غداء">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>العدد المتوقع</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-users"></i>
+                            <input type="number" name="audience-count" placeholder="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4 -->
+            <div class="section">
+                <div class="section-header">
+                    <i class="fas fa-tools"></i>
+                    <h2>الاحتياجات التقنية واللوجستية</h2>
+                </div>
+                <div class="options-group">
+                    <label class="option-item"><input type="checkbox" name="needs" value="screens"> شاشات عرض</label>
+                    <label class="option-item"><input type="checkbox" name="needs" value="audio"> صوتيات</label>
+                    <label class="option-item"><input type="checkbox" name="needs" value="mic"> ميكروفونات</label>
+                    <label class="option-item"><input type="checkbox" name="needs" value="pc"> أجهزة كمبيوتر</label>
+                    <label class="option-item"><input type="checkbox" name="needs" value="photo"> تصوير فيديو/فوتوغرافي</label>
+                    <label class="option-item"><input type="checkbox" name="needs" value="org"> تنظيم</label>
+                    <label class="option-item"><input type="checkbox" name="needs" value="ministry"> ربط مع الوزارة</label>
+                    <label class="option-item"><input type="checkbox" name="needs" value="live"> البث المباشر</label>
+                </div>
+            </div>
+
+            <!-- Section 5: Policies -->
+            <div class="section">
+                <div class="section-header">
+                    <i class="fas fa-file-contract"></i>
+                    <h2>التعهد والاعتماد والتعليمات</h2>
+                </div>
+                
+                <div class="alert-box alert-warning">
+                    <h4>تعهد الجهة الطالبة</h4>
+                    <p>
+                        1. نتعهد بالمحافظة التامة على نظافة المسرح وجميع مرافقه.<br>
+                        2. نتعهد بعدم إتلاف أي من الأثاث أو التجهيزات أو الممتلكات الموجودة فيه.<br>
+                        3. نتعهد بعدم جمع أو استلام أي مبالغ مالية من الحضور مقابل الدخول.<br>
+                        4. يُمنع إدخال المأكولات والمشروبات إلى المسرح.<br>
+                        5. في حال المخالفة، يحق للجهة المسؤولة اتخاذ الإجراءات النظامية.
+                    </p>
+                </div>
+
+                <div class="alert-box alert-info">
+                    <h4>التعليمات</h4>
+                    <p>
+                        • تعبئة النموذج قبل تاريخ الفعالية بعشرة أيام على الأقل.<br>
+                        • في حال التأجيل يرجى إبلاغ المنسق قبلها بيومين.<br>
+                        • تتولى الجهة الطالبة تأمين كافة المتطلبات والضيافة.
+                    </p>
+                </div>
+
+                <div class="alert-box alert-danger" style="text-align: center;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    تنويه: لا يتحمل المسرح أي مسؤولية حيال فقدان أو تلف الممتلكات الشخصية داخل مرافقه.
+                </div>
+
+                <div class="agreement">
+                    <label class="agreement-checkbox">
+                        <input type="checkbox" id="agree-check" onchange="toggleSubmit()">
+                        أقر وأوافق على كافة الشروط والتعليمات المذكورة أعلاه
+                    </label>
+                </div>
+            </div>
+
+            <button type="button" id="submit-btn" class="btn-submit" disabled onclick="exportToJSON()">
+                <i class="fas fa-file-export"></i>
+                تصدير وإرسال ملف البوكينج (JSON)
+            </button>
+            
+            <button type="button" id="whatsapp-submit-btn" class="btn-submit" disabled onclick="sendViaWhatsAppDirect()" style="margin-top: 10px; background: linear-gradient(135deg, #25D366, #128C7E);">
+                <i class="fab fa-whatsapp"></i>
+                إرسال الطلب عبر الواتساب المباشر
+            </button>
+            
+            <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-top: 20px; flex-wrap: wrap;">
+                <button type="button" id="pdf-btn" onclick="exportToPDF()" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:1.05rem; font-weight:bold; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-file-pdf"></i> طباعة / تصدير النموذج كملف PDF مفرغ
+                </button>
+                <button type="button" id="word-btn" onclick="exportToWord()" style="background:none; border:none; color:var(--primary); cursor:pointer; font-size:1.05rem; font-weight:bold; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-file-word"></i> تصدير النموذج كملف وورد
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+    <script>
+        function exportToPDF() {
+            window.print();
+        }
+        function toggleSubmit() {
+            const check = document.getElementById('agree-check');
+            const btn = document.getElementById('submit-btn');
+            const waBtn = document.getElementById('whatsapp-submit-btn');
+            if (btn) btn.disabled = !check.checked;
+            if (waBtn) waBtn.disabled = !check.checked;
+        }
+
+        function calcDigitalDays() {
+            const startInput = document.getElementById('digital-start-date');
+            const endInput = document.getElementById('digital-end-date');
+            const daysInput = document.getElementById('digital-days-count');
+            if (!startInput || !endInput || !daysInput) return;
+
+            let sVal = startInput.value;
+            let eVal = endInput.value;
+            if (!sVal) return;
+
+            if (!eVal || new Date(eVal) < new Date(sVal)) {
+                eVal = sVal;
+                endInput.value = sVal;
+            }
+
+            const sD = new Date(sVal);
+            const eD = new Date(eVal);
+            const diffDays = Math.ceil(Math.abs(eD - sD) / (1000 * 60 * 60 * 24)) + 1;
+            daysInput.value = diffDays;
+        }
+
+        function calcDigitalEndDateFromDays() {
+            const startInput = document.getElementById('digital-start-date');
+            const endInput = document.getElementById('digital-end-date');
+            const daysInput = document.getElementById('digital-days-count');
+            if (!startInput || !endInput || !daysInput) return;
+
+            const sVal = startInput.value;
+            let days = parseInt(daysInput.value) || 1;
+            if (days < 1) {
+                days = 1;
+                daysInput.value = 1;
+            }
+
+            if (sVal) {
+                const sD = new Date(sVal);
+                sD.setDate(sD.getDate() + (days - 1));
+                endInput.value = sD.toISOString().split('T')[0];
+                calcDigitalDays();
+            }
+        }
+
+        function toggleOtherEventTypeInput() {
+            const checkbox = document.getElementById('event-types-other-checkbox');
+            const wrapper = document.getElementById('other-event-type-input-wrapper-digital');
+            if (checkbox && wrapper) {
+                wrapper.style.display = checkbox.checked ? 'block' : 'none';
+                if (checkbox.checked) document.getElementById('other-event-type-name').focus();
+            }
+        }
+
+        function exportToJSON() {
+            const form = document.getElementById('booking-form-official');
+            const formData = new FormData(form);
+            
+            // Get checked needs
+            const needs = Array.from(document.querySelectorAll('input[name="needs"]:checked')).map(cb => cb.value);
+            
+            // Get checked venues
+            const venueEls = Array.from(document.querySelectorAll('input[name="venue"]:checked'));
+            const venueNames = venueEls.map(v => v.parentElement.textContent.trim());
+
+            const data = {
+                entityType: formData.get('entity-type'),
+                entityName: formData.get('entity-name'),
+                coordName: formData.get('coord-name'),
+                coordMobile: formData.get('coord-mobile'),
+                venueNames: venueNames,
+                venueName: venueNames.join('، '), // For backward compatibility
+                date: formData.get('date'),
+                startTime: formData.get('start-time'),
+                audienceGender: formData.get('audience-gender'),
+                duration: formData.get('duration'),
+                period: formData.get('period'),
+                eventTitle: formData.get('event-title'),
+                eventTypes: Array.from(document.querySelectorAll('input[name="event-types"]:checked')).map(cb => cb.value),
+                otherEventType: document.getElementById('other-event-type-name').value,
+                vipGuest: formData.get('vip-guest'),
+                activities: formData.get('activities'),
+                audienceCount: formData.get('audience-count'),
+                needs: needs,
+                exportedAt: new Date().toISOString()
+            };
+
+            if (!data.eventTitle || !data.entityName) {
+                alert('يرجى إكمال البيانات الأساسية قبل التصدير.');
+                return;
+            }
+
+            const blob = new Blob([JSON.stringify(data, null, 4)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Booking_${data.entityName}_${data.date}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function sendViaWhatsAppDirect() {
+            const form = document.getElementById('booking-form-official');
+            const formData = new FormData(form);
+            
+            const venueEls = Array.from(document.querySelectorAll('input[name="venue"]:checked'));
+            const venueNames = venueEls.map(v => v.parentElement.textContent.trim());
+
+            const entityName = formData.get('entity-name') || '';
+            const eventTitle = formData.get('event-title') || '';
+            const coordName = formData.get('coord-name') || '';
+            const coordMobile = formData.get('coord-mobile') || '';
+            const date = formData.get('date') || '';
+            const startTime = formData.get('start-time') || '';
+            const period = formData.get('period') || '';
+            const count = formData.get('audience-count') || '';
+
+            if (!eventTitle || !entityName) {
+                alert('يرجى إكمال البيانات الأساسية قبل الإرسال.');
+                return;
+            }
+
+            const message = `طلب حجز جديد عبر النموذج الرقمي 📌
+----------------------------------------
+مسمى الفعالية: ${eventTitle}
+الجهة الطالبة: ${entityName}
+المنسق: ${coordName} (${coordMobile})
+المقر المطلوب: ${venueNames.join('، ')}
+تاريخ التنفيذ: ${date}
+الوقت والفترة: ${startTime} ${period}
+عدد الحضور التقديري: ${count}
+----------------------------------------
+تم تقديم الطلب والإقرار بالشروط والتعليمات الرسمية.`;
+
+            const cleanTargetMobile = '966582233500';
+            const url = `https://api.whatsapp.com/send?phone=${cleanTargetMobile}&text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
+        }
+
+        function exportToWord() {
+            const form = document.getElementById('booking-form-official');
+            const formData = new FormData(form);
+            
+            // Get checked needs
+            const needsEls = Array.from(document.querySelectorAll('input[name="needs"]:checked'));
+            const needs = needsEls.map(cb => cb.parentElement.textContent.trim());
+            
+            // Get checked venues
+            const venueEls = Array.from(document.querySelectorAll('input[name="venue"]:checked'));
+            const venueNames = venueEls.map(v => v.parentElement.textContent.trim());
+            
+            // Get checked event types
+            const eventTypeEls = Array.from(document.querySelectorAll('input[name="event-types"]:checked'));
+            let eventTypes = eventTypeEls.map(cb => {
+                if(cb.value === 'other') {
+                    return `أخرى: ${document.getElementById('other-event-type-name').value}`;
+                }
+                return cb.parentElement.textContent.trim();
+            });
+
+            const data = {
+                entityType: formData.get('entity-type'),
+                entityName: formData.get('entity-name') || '',
+                coordName: formData.get('coord-name') || '',
+                coordMobile: formData.get('coord-mobile') || '',
+                venueNames: venueNames.length > 0 ? venueNames.join('، ') : '',
+                date: formData.get('date') || '',
+                startTime: formData.get('start-time') || '',
+                audienceGender: formData.get('audience-gender') === 'boys' ? 'بنين' : (formData.get('audience-gender') === 'girls' ? 'بنات' : 'عام'),
+                duration: formData.get('duration') || '',
+                period: formData.get('period') === 'morning' ? 'صباحاً' : 'مساءً',
+                eventTitle: formData.get('event-title') || '',
+                eventTypes: eventTypes.length > 0 ? eventTypes.join('، ') : '',
+                vipGuest: formData.get('vip-guest') || '',
+                activities: formData.get('activities') || '',
+                audienceCount: formData.get('audience-count') || '',
+                needs: needs.length > 0 ? needs.join('، ') : ''
+            };
+
+            let entityTypeAr = '';
+            switch(data.entityType) {
+                case 'dept': entityTypeAr = 'إدارة / قسم / وحدة'; break;
+                case 'sect': entityTypeAr = 'جهة تعليمية'; break;
+                case 'unit': entityTypeAr = 'جهة وزارية'; break;
+                case 'other': entityTypeAr = 'أخرى'; break;
+                default: entityTypeAr = '';
+            }
+
+            const htmlContent = `
+            <html dir="rtl" lang="ar">
+            <head>
+                <meta charset="utf-8">
+                <style>
+                    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; direction: rtl; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid #000; padding: 10px; text-align: right; }
+                    th { background-color: #f0f0f0; width: 30%; font-weight: bold; }
+                    h1 { text-align: center; color: #1e293b; border-bottom: 2px solid #1e293b; padding-bottom: 10px; }
+                    h2 { color: #4f46e5; margin-top: 30px; font-size: 1.2rem; }
+                </style>
+            </head>
+            <body>
+                <h1>نموذج طلب حجز</h1>
+                
+                <h2>بيانات الجهة والمنسق</h2>
+                <table>
+                    <tr><th>نوع الجهة</th><td>${entityTypeAr}</td></tr>
+                    <tr><th>اسم الجهة</th><td>${data.entityName}</td></tr>
+                    <tr><th>مسؤول التنسيق</th><td>${data.coordName}</td></tr>
+                    <tr><th>رقم الجوال</th><td>${data.coordMobile}</td></tr>
+                </table>
+
+                <h2>توقيت ومقر الفعالية</h2>
+                <table>
+                    <tr><th>المقر المطلوب</th><td>${data.venueNames}</td></tr>
+                    <tr><th>تاريخ الفعالية</th><td>${data.date}</td></tr>
+                    <tr><th>فئة الحضور</th><td>${data.audienceGender}</td></tr>
+                    <tr><th>مدة الفعالية</th><td>${data.duration} ساعات</td></tr>
+                    <tr><th>الفترة</th><td>${data.period}</td></tr>
+                    <tr><th>الساعة</th><td>${formatTime12h(data.startTime)}</td></tr>
+                </table>
+
+                <h2>تفاصيل الفعالية</h2>
+                <table>
+                    <tr><th>مسمى الفعالية</th><td>${data.eventTitle}</td></tr>
+                    <tr><th>نوع الفعالية</th><td>${data.eventTypes}</td></tr>
+                    <tr><th>الضيف / الراعي</th><td>${data.vipGuest}</td></tr>
+                    <tr><th>الفعاليات المصاحبة</th><td>${data.activities}</td></tr>
+                    <tr><th>العدد المتوقع</th><td>${data.audienceCount}</td></tr>
+                </table>
+
+                <h2>الاحتياجات التقنية واللوجستية</h2>
+                <table>
+                    <tr><th>الاحتياجات</th><td>${data.needs}</td></tr>
+                </table>
+                
+                <br><br>
+                <table style="border: none; margin-top: 40px;">
+                    <tr>
+                        <td style="border: none; text-align: right; width: 50%;"><strong>توقيع المسؤول:</strong> ............................</td>
+                        <td style="border: none; text-align: left; width: 50%;"><strong>الختم:</strong> ............................</td>
+                    </tr>
+                </table>
+            </body>
+            </html>
+            `;
+
+            const fileName = `Booking_${data.entityName}_${data.date}.doc`;
+            const content = '\ufeff' + htmlContent;
+
+            if (window.electronAPI && window.electronAPI.saveWordFile) {
+                // Electron native save
+                window.electronAPI.saveWordFile(content, fileName);
+            } else {
+                // Standard browser fallback
+                const blob = new Blob([content], {
+                    type: 'application/msword'
+                });
+                
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        function formatTime12h(time24) {
+            if (!time24 || !time24.includes(':')) return time24;
+            let [hours, minutes] = time24.split(':');
+            hours = parseInt(hours);
+            const period = hours >= 12 ? 'مساءً' : 'صباحاً';
+            hours = hours % 12 || 12;
+            // Enforce English numerals for the hours
+            const hoursStr = hours.toString().padStart(2, '0');
+            return `${hoursStr}:${minutes} ${period}`;
+        }
+    </script>
+</body>
+</html>

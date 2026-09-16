@@ -1,0 +1,52 @@
+{
+  "name": "itqan-resource-management",
+  "version": "2.0.0",
+  "description": "نظام إتقان المطور v2.0 - إدارة الموارد والمسارح والفعاليات",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "web": "node server.js",
+    "build-win": "electron-packager . ItqanApp --platform=win32 --arch=x64 --out=dist --overwrite",
+    "dist": "electron-builder --win"
+  },
+  "build": {
+    "appId": "com.itqan.management",
+    "productName": "نظام إتقان المطور v2.0",
+    "directories": {
+      "output": "dist/installer"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "runAfterFinish": true
+    },
+    "files": [
+      "**/*",
+      "!dist/**/*",
+      "!Backups/**/*"
+    ]
+  },
+  "keywords": [
+    "management",
+    "resource",
+    "itqan"
+  ],
+  "author": "Antigravity",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^26.8.1",
+    "electron-packager": "^17.1.2",
+    "electron-winstaller": "^5.4.0"
+  },
+  "dependencies": {
+    "pdfjs-dist": "^5.6.205"
+  }
+}
