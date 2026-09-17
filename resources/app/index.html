@@ -66,13 +66,17 @@
                     <i class="fas fa-cog"></i>
                     <span>الإعدادات العامة</span>
                 </li>
-                <li onclick="window.open('booking_form_digital.html', '_blank', 'nodeIntegration=no')">
-                    <i class="fas fa-file-signature"></i>
-                    <span>فتح النموذج الرقمي</span>
-                </li>
-                <li onclick="window.open('theater_seats.html', '_blank', 'nodeIntegration=no')">
+                <li data-view="theater-seats" style="border-top: 1px solid rgba(255,255,255,0.08); margin-top: 8px; padding-top: 10px;">
                     <i class="fas fa-chair" style="color: #00d2ff;"></i>
-                    <span>نظام حجز مقاعد المسرح والـ QR</span>
+                    <span>مقاعد المسرح والـ QR</span>
+                </li>
+                <li data-view="digital-form">
+                    <i class="fas fa-file-signature" style="color: #a855f7;"></i>
+                    <span>النموذج الرقمي للحجز</span>
+                </li>
+                <li data-view="staff-portal">
+                    <i class="fas fa-user-shield" style="color: #e5a638;"></i>
+                    <span>بوابة المنظم وموظف الباب</span>
                 </li>
             </ul>
             <div class="sidebar-footer">
@@ -146,6 +150,30 @@
                                 <h3>المعدات والعهدة</h3>
                                 <div class="stat-value" id="stat-equipment">0 معدة</div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Portals Banner -->
+                    <div class="glass-card" style="margin-bottom: 25px; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px; background: linear-gradient(135deg, rgba(14, 165, 233, 0.08), rgba(99, 102, 241, 0.08)); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 16px;">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(14, 165, 233, 0.2); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #00d2ff; border: 1px solid rgba(14, 165, 233, 0.3);">
+                                <i class="fas fa-network-wired"></i>
+                            </div>
+                            <div>
+                                <h4 style="margin: 0; font-size: 1.05rem; color: #f8fafc; font-weight: 700;">البوابات والأنظمة المدمجة مع إتقان</h4>
+                                <p style="margin: 4px 0 0 0; font-size: 0.8rem; color: var(--text-muted);">الوصول السريع لنظام مقاعد المسرح والـ QR، النموذج الرقمي للجهات، وبوابة المنظمين</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button onclick="switchView('theater-seats')" class="btn-primary" style="background: linear-gradient(135deg, #0ea5e9, #0284c7); border: none; border-radius: 10px; padding: 9px 18px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);">
+                                <i class="fas fa-chair"></i> مقاعد المسرح والـ QR
+                            </button>
+                            <button onclick="switchView('digital-form')" class="btn-secondary" style="background: rgba(168, 85, 247, 0.1); border-radius: 10px; padding: 9px 18px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; color: #c084fc; border: 1px solid rgba(192, 132, 252, 0.3);">
+                                <i class="fas fa-file-signature"></i> النموذج الرقمي
+                            </button>
+                            <button onclick="switchView('staff-portal')" class="btn-secondary" style="background: rgba(245, 158, 11, 0.1); border-radius: 10px; padding: 9px 18px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3);">
+                                <i class="fas fa-user-shield"></i> بوابة المنظمين
+                            </button>
                         </div>
                     </div>
 
@@ -608,6 +636,63 @@
                     
                     <div id="maintenance-status" style="margin-top: 30px; padding: 15px; border-radius: 12px; display: none; text-align: center; font-weight: bold;">
                         <!-- Message via JS -->
+                    </div>
+                </section>
+
+                <!-- Theater Seats & QR Cards View -->
+                <section id="theater-seats-view" class="view" style="display: none; height: calc(100vh - 120px); padding: 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 5px;">
+                        <div>
+                            <h2 style="font-size: 1.25rem; font-weight: 700; color: #00d2ff; margin: 0;"><i class="fas fa-chair" style="margin-left: 8px;"></i>نظام مقاعد المسرح وبطاقات الـ QR Code</h2>
+                            <p style="color: var(--text-muted); font-size: 0.8rem; margin: 4px 0 0 0;">إدارة خريطة المقاعد، توليد بطاقات الحضور الرقمية، وتأكيد الحجوزات</p>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn-secondary" onclick="window.open('theater_seats.html', '_blank')" style="border-radius: 10px; padding: 7px 14px; font-size: 0.85rem;">
+                                <i class="fas fa-external-link-alt" style="margin-left: 6px;"></i> فتح كنافذة منفصلة
+                            </button>
+                            <button class="btn-primary" onclick="document.getElementById('theater-seats-iframe').contentWindow.location.reload()" style="border-radius: 10px; padding: 7px 14px; font-size: 0.85rem;">
+                                <i class="fas fa-sync" style="margin-left: 6px;"></i> تحديث
+                            </button>
+                        </div>
+                    </div>
+                    <div class="glass-card" style="height: calc(100% - 60px); border-radius: 16px; overflow: hidden; padding: 0; border: 1px solid var(--glass-border);">
+                        <iframe id="theater-seats-iframe" src="theater_seats.html" style="width: 100%; height: 100%; border: none; background: #060D1A;"></iframe>
+                    </div>
+                </section>
+
+                <!-- Digital Booking Form View -->
+                <section id="digital-form-view" class="view" style="display: none; height: calc(100vh - 120px); padding: 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 5px;">
+                        <div>
+                            <h2 style="font-size: 1.25rem; font-weight: 700; color: #c084fc; margin: 0;"><i class="fas fa-file-signature" style="margin-left: 8px;"></i>النموذج الرقمي لحجز القاعات والفعاليات</h2>
+                            <p style="color: var(--text-muted); font-size: 0.8rem; margin: 4px 0 0 0;">نموذج التقديم الإلكتروني للجهات الخارجية لطلب حجز المقرات</p>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn-secondary" onclick="window.open('booking_form_digital.html', '_blank')" style="border-radius: 10px; padding: 7px 14px; font-size: 0.85rem;">
+                                <i class="fas fa-external-link-alt" style="margin-left: 6px;"></i> فتح كنافذة منفصلة
+                            </button>
+                        </div>
+                    </div>
+                    <div class="glass-card" style="height: calc(100% - 60px); border-radius: 16px; overflow: hidden; padding: 0; border: 1px solid var(--glass-border);">
+                        <iframe id="digital-form-iframe" src="booking_form_digital.html" style="width: 100%; height: 100%; border: none; background: #f8fafc;"></iframe>
+                    </div>
+                </section>
+
+                <!-- Staff & Organizer Door Portal View -->
+                <section id="staff-portal-view" class="view" style="display: none; height: calc(100vh - 120px); padding: 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 5px;">
+                        <div>
+                            <h2 style="font-size: 1.25rem; font-weight: 700; color: #fbbf24; margin: 0;"><i class="fas fa-user-shield" style="margin-left: 8px;"></i>بوابة المنظم وموظف الباب</h2>
+                            <p style="color: var(--text-muted); font-size: 0.8rem; margin: 4px 0 0 0;">بوابة التحقق ومسح بطاقات الـ QR وإدارة دخول الحضور عبر الأبواب</p>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn-secondary" onclick="window.open('staff.html', '_blank')" style="border-radius: 10px; padding: 7px 14px; font-size: 0.85rem;">
+                                <i class="fas fa-external-link-alt" style="margin-left: 6px;"></i> فتح كنافذة منفصلة
+                            </button>
+                        </div>
+                    </div>
+                    <div class="glass-card" style="height: calc(100% - 60px); border-radius: 16px; overflow: hidden; padding: 0; border: 1px solid var(--glass-border);">
+                        <iframe id="staff-portal-iframe" src="staff.html" style="width: 100%; height: 100%; border: none; background: #060D1A;"></iframe>
                     </div>
                 </section>
             </div>
