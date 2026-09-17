@@ -1,44 +1,2020 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300d2ff'><path d='M4 10V17C4 18.1 4.9 19 6 19H18C19.1 19 20 18.1 20 17V10'/><path d='M2 8H22V10H2z'/><path d='M12 2C9.24 2 7 4.24 7 7H17C17 4.24 14.76 2 12 2z'/></svg>" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="theme-color" content="#060D1A" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="إدارة المسرح" />
-    <link rel="manifest" href="./manifest.json" />
-    <title>نظام حجز مقاعد المسرح وبطاقات الـ QR Code</title>
-
-    <!-- Tailwind CSS CDN for instant utilities -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            colors: {
-              obsidian: '#07070b',
-              velvet: '#0e0e17'
-            }
-          }
-        }
-      }
-    </script>
-
-    <!-- Fonts -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إتقان | إدارة المهام والقاعات</title>
+    <!-- Google Fonts: Outfit & Readex Pro for Arabic support -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script type="module" crossorigin src="./assets/main-DaOtXgU_.js"></script>
-    <link rel="modulepreload" crossorigin href="./assets/index-Bk0bwvm2.js">
-    <link rel="modulepreload" crossorigin href="./assets/BatchSeatCardsPrintModal-DrNEnefZ.js">
-    <link rel="modulepreload" crossorigin href="./assets/BeneficiaryServicesGrid-CLcYA695.js">
-    <link rel="stylesheet" crossorigin href="./assets/index-CZKY7DIE.css">
-  </head>
-  <body class="bg-[#060D1A] text-slate-100 antialiased selection:bg-cyan-400 selection:text-slate-950 font-sans">
-    <div id="root"></div>
-  </body>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Readex+Pro:wght@200;400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <!-- PDF.js for importing booking data -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        // Set worker path for PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+</head>
+<body>
+    <!-- Global Print Area (Strictly for physical print isolation) -->
+    <div id="global-print-area"></div>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo">
+                <i class="fas fa-rocket"></i>
+                <span>إتقان</span>
+            </div>
+            <ul class="nav-links">
+                <li class="active" data-view="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>الرئيسية</span>
+                </li>
+                <li data-view="rooms">
+                    <i class="fas fa-door-open"></i>
+                    <span>صفحة القاعات</span>
+                </li>
+                <li data-view="calendar">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>التقويم</span>
+                </li>
+                <li data-view="equipment">
+                    <i class="fas fa-tools"></i>
+                    <span>المعدات</span>
+                </li>
+                <li data-view="bookings-list">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>إدارة الحجوزات</span>
+                </li>
+                <li data-view="blacklist">
+                    <i class="fas fa-ban" style="color: #ef4444;"></i>
+                    <span>القائمة السوداء</span>
+                </li>
+                <li data-view="reports">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>التقارير التحليلية</span>
+                </li>
+                <li data-view="maintenance">
+                    <i class="fas fa-microchip"></i>
+                    <span>صيانة النظام</span>
+                </li>
+                <li data-view="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>الإعدادات العامة</span>
+                </li>
+                <li onclick="window.open('booking_form_digital.html', '_blank', 'nodeIntegration=no')">
+                    <i class="fas fa-file-signature"></i>
+                    <span>فتح النموذج الرقمي</span>
+                </li>
+                <li onclick="window.open('theater_seats.html', '_blank', 'nodeIntegration=no')">
+                    <i class="fas fa-chair" style="color: #00d2ff;"></i>
+                    <span>نظام حجز مقاعد المسرح والـ QR</span>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <button id="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div id="notification-wrapper" style="position: relative; margin-left: 20px; cursor: pointer;" onclick="toggleNotificationDropdown(event)">
+                    <i class="fas fa-bell" style="font-size: 1.3rem; color: var(--text-muted);"></i>
+                    <span id="notification-badge" style="position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 10px; display: none;">0</span>
+                    
+                    <div id="notification-dropdown" class="glass-card" style="display: none; position: absolute; top: 40px; right: 0; width: 300px; max-height: 400px; overflow-y: auto; z-index: 1000; padding: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.4); border: 1px solid var(--glass-border);">
+                        <div style="font-weight: 700; font-size: 0.9rem; margin-bottom: 10px; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px;">تنبيهات الفعاليات القادمة (خلال يومين)</div>
+                        <div id="notification-list" style="display: flex; flex-direction: column; gap: 10px;">
+                            <p style="font-size: 0.8rem; color: var(--text-muted); text-align: center;">لا يوجد تنبيهات حالياً</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="search-bar" style="flex-grow: 1; margin-right: 20px;">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="global-search-input" placeholder="بحث عن قاعات أو فعاليات..." oninput="handleGlobalSearch(this.value)">
+                </div>
+                <div class="user-profile">
+                    <div id="system-header-logo-container" style="height: 60px; margin-left: 15px; display: flex; align-items: center; gap: 15px;">
+                        <!-- Logo injected by JS -->
+                    </div>
+                    <div id="system-header-text-container" style="display: flex; flex-direction: column; justify-content: center; border-right: 2px solid var(--glass-border); padding-right: 15px; margin-right: 15px;">
+                        <span class="dynamic-org-name" style="font-size: 0.95rem; font-weight: 700; color: var(--primary-light); line-height: 1.2;">إدارة التعليم</span>
+                        <span class="dynamic-dept-name" style="font-size: 0.75rem; color: var(--text-muted);">إدارة الاتصال المؤسسي</span>
+                    </div>
+                </div>
+            </header>
+
+            <div id="content-area">
+                <!-- Dashboard View (Default) -->
+                <section id="dashboard-view" class="view active">
+                    <div class="welcome-section" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+                        <div>
+                            <h1>مرحباً بك</h1>
+                            <p>نظام إتقان | إليك نظرة سريعة على ما يحدث اليوم في مقراتك.</p>
+                        </div>
+                        <div class="hero-clock glass-card" style="padding: 15px 30px; display: flex; flex-direction: column; align-items: center; min-width: 250px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1)); border: 1px solid var(--glass-border);">
+                            <div id="live-time" style="font-size: 2.2rem; font-weight: 800; color: var(--primary-light); letter-spacing: 2px;">00:00:00</div>
+                            <div id="live-date" style="font-size: 0.9rem; color: var(--text-muted); margin-top: 5px;">الاثنين، 27 أبريل 2026</div>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card" onclick="switchView('bookings-list')" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                            <div class="stat-icon tasks-icon"><i class="fas fa-calendar-check"></i></div>
+                            <div class="stat-info">
+                                <h3>الحجوزات النشطة</h3>
+                                <div class="stat-value" id="stat-tasks">0 فعالية</div>
+                            </div>
+                        </div>
+                        <div class="stat-card" onclick="switchView('rooms')" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                            <div class="stat-icon rooms-icon"><i class="fas fa-door-open"></i></div>
+                            <div class="stat-info">
+                                <h3>المقرات المتاحة</h3>
+                                <div class="stat-value" id="stat-rooms">0 مقر</div>
+                            </div>
+                        </div>
+                        <div class="stat-card" onclick="switchView('equipment')" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                            <div class="stat-icon completion-icon"><i class="fas fa-boxes-stacked"></i></div>
+                            <div class="stat-info">
+                                <h3>المعدات والعهدة</h3>
+                                <div class="stat-value" id="stat-equipment">0 معدة</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-content">
+                        <!-- Left Column: Daily Agenda -->
+                        <div class="glass-card" style="display: flex; flex-direction: column;">
+                            <div class="card-header">
+                                <h3>أجندة اليوم <span id="current-day-label" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 400; margin-right: 10px;">(اليوم)</span></h3>
+                                <button class="btn-text" onclick="switchView('calendar')">عرض التقويم</button>
+                            </div>
+                            <div id="daily-agenda-container" style="flex-grow: 1;">
+                                <!-- Today's events rendered by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Quick Actions & Mini View -->
+                        <div style="display: flex; flex-direction: column; gap: 25px;">
+                            <div class="glass-card">
+                                <div class="card-header">
+                                    <h3>إجراءات سريعة</h3>
+                                </div>
+                                <div class="quick-actions-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                    <button class="btn-primary" onclick="openRoomModal()" style="padding: 15px; font-size: 0.9rem; display: flex; flex-direction: column; align-items: center; gap: 8px; border-radius: var(--radius-md);">
+                                        <i class="fas fa-plus-circle" style="font-size: 1.2rem;"></i> حجز جديد
+                                    </button>
+                                    <button class="btn-secondary" onclick="runFormExport()" style="padding: 15px; font-size: 0.9rem; display: flex; flex-direction: column; align-items: center; gap: 8px; border-radius: var(--radius-md); border-color: var(--primary-light); color: var(--primary-light);">
+                                        <i class="fas fa-file-contract" style="font-size: 1.2rem;"></i> تصدير استمارة فارغة
+                                    </button>
+                                    <button class="btn-secondary" onclick="openResourceModal('room')" style="padding: 15px; font-size: 0.9rem; display: flex; flex-direction: column; align-items: center; gap: 8px; border-radius: var(--radius-md);">
+                                        <i class="fas fa-plus-square" style="font-size: 1.2rem;"></i> إضافة قاعة
+                                    </button>
+                                    <button class="btn-secondary" onclick="openMaintenanceFormModal()" style="padding: 15px; font-size: 0.9rem; display: flex; flex-direction: column; align-items: center; gap: 8px; border-radius: var(--radius-md); border-color: var(--warning); color: var(--warning); background: rgba(245, 158, 11, 0.05);">
+                                        <i class="fas fa-screwdriver-wrench" style="font-size: 1.2rem;"></i> صيانة القاعات والمسارح
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="glass-card">
+                                <div class="card-header">
+                                    <h3>المقرات الرئيسية</h3>
+                                    <button class="btn-text" onclick="switchView('rooms')">الكل</button>
+                                </div>
+                                <div class="room-grid-mini">
+                                    <!-- Mini grid rendered by JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Settings View -->
+                <section id="settings-view" class="view">
+                    <div class="view-header">
+                        <h1>إعدادات النظام والتخصيص</h1>
+                    </div>
+                    
+                    <div class="settings-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px;">
+                        <!-- Branding Card -->
+                        <div class="glass-card settings-card">
+                            <div class="card-header">
+                                <i class="fas fa-paint-brush" style="color: var(--primary-light);"></i>
+                                <h3>هوية النظام (الشعار)</h3>
+                            </div>
+                            <div class="settings-body" style="padding: 20px; text-align: center;">
+                                <div id="logo-preview-container" style="width: 150px; height: 150px; margin: 0 auto 20px; border: 2px dashed var(--glass-border); border-radius: 15px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: rgba(0,0,0,0.1);">
+                                    <p id="no-logo-text" style="color: var(--text-muted); font-size: 0.8rem;">لا يوجد شعار مخصص</p>
+                                    <img id="logo-preview-img" src="" style="max-width: 100%; max-height: 100%; display: none;">
+                                </div>
+                                <div class="upload-actions">
+                                    <input type="file" id="logo-upload-input" accept="image/*" style="display: none;" onchange="handleLogoUpload(event)">
+                                    <button class="btn-primary" onclick="document.getElementById('logo-upload-input').click()">
+                                        <i class="fas fa-upload"></i> رفع شعار جديد
+                                    </button>
+                                    <button class="btn-secondary" style="margin-top: 10px; width: 100%; color: #ef4444; border-color: rgba(239, 68, 68, 0.2);" onclick="resetLogo()">
+                                        <i class="fas fa-trash"></i> حذف الشعار والعودة للافتراضي
+                                    </button>
+                                </div>
+                                <p style="margin-top: 15px; font-size: 0.75rem; color: var(--text-muted);">يفضل استخدام صورة بخلفية شفافة (PNG) وبأبعاد مربعة.</p>
+                            </div>
+                        </div>
+
+                        <!-- Organization Info Card -->
+                        <div class="glass-card settings-card">
+                            <div class="card-header">
+                                <i class="fas fa-building" style="color: var(--primary-light);"></i>
+                                <h3>معلومات الجهة</h3>
+                            </div>
+                            <div class="settings-body" style="padding: 20px;">
+                                <div class="form-group" style="margin-bottom: 20px;">
+                                    <label style="display: block; margin-bottom: 8px; font-size: 0.9rem;">اسم المنشأة / الجهة</label>
+                                    <input type="text" id="setting-org-name" placeholder="مثال: الإدارة العامة للتعليم" style="width: 100%;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 20px;">
+                                    <label style="display: block; margin-bottom: 8px; font-size: 0.9rem;">القسم المسؤول</label>
+                                    <input type="text" id="setting-dept-name" placeholder="مثال: قسم الاتصال المؤسسي" style="width: 100%;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 20px;">
+                                    <label style="display: block; margin-bottom: 8px; font-size: 0.9rem;">أرقام التواصل والاستفسار</label>
+                                    <input type="text" id="setting-contact-number" placeholder="مثال: 05XXXXXXXX" style="width: 100%;">
+                                </div>
+                                <button class="btn-primary" style="width: 100%; height: 45px; background: linear-gradient(135deg, #6366f1, #4f46e5);" onclick="saveGeneralSettings()">
+                                    <i class="fas fa-save"></i> حفظ التغييرات والبيانات
+                                </button>
+                                <p style="margin-top: 15px; font-size: 0.75rem; color: var(--text-muted);">تظهر هذه المعلومات في ترويسة التقارير والمطبوعات.</p>
+                            </div>
+                        </div>
+
+                        <!-- NEW: Official Stamp Card -->
+                        <div class="glass-card settings-card">
+                            <div class="card-header">
+                                <i class="fas fa-file-signature" style="color: var(--primary-light);"></i>
+                                <h3>ختم الاعتماد الرسمي</h3>
+                            </div>
+                            <div class="settings-body" style="padding: 20px; text-align: center;">
+                                <div id="stamp-preview-container" style="width: 200px; height: 120px; margin: 0 auto 20px; border: 2px dashed var(--glass-border); border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: rgba(255,255,255,0.05);">
+                                    <p id="no-stamp-text" style="color: var(--text-muted); font-size: 0.8rem;">لا يوجد ختم معتمد حالياً</p>
+                                    <img id="stamp-preview-img" src="" style="max-width: 100%; max-height: 100%; display: none;">
+                                </div>
+                                <div class="upload-actions">
+                                    <input type="file" id="stamp-upload-input" accept="image/*" style="display: none;" onchange="handleStampUpload(event)">
+                                    <button class="btn-primary" onclick="document.getElementById('stamp-upload-input').click()">
+                                        <i class="fas fa-upload"></i> رفع صورة الختم المعتمد
+                                    </button>
+                                    <button class="btn-secondary" style="margin-top: 10px; width: 100%; color: #ef4444; border-color: rgba(239, 68, 68, 0.2);" onclick="resetStamp()">
+                                        <i class="fas fa-trash"></i> حذف الختم
+                                    </button>
+                                </div>
+                                <p style="margin-top: 15px; font-size: 0.75rem; color: var(--text-muted);">يتم إدراج هذا الختم تلقائياً في خانة الاعتماد بجميع التقارير.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Blacklist View -->
+                <section id="blacklist-view" class="view">
+                    <div class="view-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; margin-bottom: 25px;">
+                        <div>
+                            <h1 style="color: #ef4444; text-shadow: 0 0 10px rgba(239, 68, 68, 0.15); margin: 0; font-size: 1.8rem;"><i class="fas fa-ban"></i> القائمة السوداء للجهات والمنسقين</h1>
+                            <p style="color: var(--text-muted); margin: 5px 0 0 0; font-size: 0.9rem;">إدارة الجهات والمنسقين المحظورين من الحجز وتفعيل حظر حجزهم تلقائياً في النظام.</p>
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="btn-secondary" onclick="window.printBlacklist()" style="border-color: #ef4444; color: #ef4444; background: rgba(239, 68, 68, 0.05); padding: 10px 24px; font-weight: 700; border-radius: 8px; cursor: pointer;">
+                                <i class="fas fa-print"></i> طباعة القائمة
+                            </button>
+                            <button class="btn-primary" onclick="window.openAddBlacklistModal()" style="background: linear-gradient(135deg, #ef4444, #b91c1c); border-color: #ef4444; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); padding: 10px 24px; font-weight: 700; border-radius: 8px; cursor: pointer;">
+                                <i class="fas fa-plus-circle"></i> إضافة حظر جديد
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="glass-card" style="padding: 25px; border-radius: 12px; background: rgba(255,255,255,0.01); border: 1px solid var(--glass-border);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                            <h3 style="margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; color: var(--primary-light);"><i class="fas fa-users-slash" style="color: #ef4444;"></i> الكيانات والأفراد المدرجين بالحظر</h3>
+                            <div style="position: relative; width: 320px;">
+                                <i class="fas fa-search" style="position: absolute; right: 12px; top: 12px; color: var(--text-muted);"></i>
+                                <input type="text" id="blacklist-search" placeholder="بحث عن اسم جهة أو منسق محظور..." oninput="window.renderBlacklistTable(this.value)" style="width: 100%; padding: 10px 35px 10px 15px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.25); color: white; outline: none; box-sizing: border-box; font-family: 'Readex Pro', sans-serif; font-size: 0.85rem;">
+                            </div>
+                        </div>
+
+                        <div style="overflow-x: auto; width: 100%;">
+                            <table style="width: 100%; border-collapse: collapse; min-width: 600px; text-align: right; font-family: 'Readex Pro', sans-serif;">
+                                <thead>
+                                    <tr style="border-bottom: 2px solid var(--glass-border); color: var(--primary-light); height: 45px; font-size: 0.9rem;">
+                                        <th style="padding: 10px;">النوع</th>
+                                        <th style="padding: 10px;">الاسم / الكيان</th>
+                                        <th style="padding: 10px;">سبب الحظر والمنع</th>
+                                        <th style="padding: 10px;">تاريخ الإدراج</th>
+                                        <th style="padding: 10px; text-align: left;">الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="blacklist-table-body" style="font-size: 0.85rem;">
+                                    <!-- Dynamic content via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Rooms View -->
+                <section id="rooms-view" class="view">
+                    <div class="view-header">
+                        <h1>إدارة القاعات والمسارح</h1>
+                        <div class="header-actions" style="display: flex; gap: 10px;">
+                            <button class="btn-secondary" onclick="openResourceModal('room')">+ إضافة قاعة</button>
+                            <button class="btn-primary" onclick="openRoomModal()">+ حجز جديد</button>
+                        </div>
+                    </div>
+                    <div class="rooms-container full-grid" id="rooms-full-grid">
+                        <!-- Full Room Grid Rendered by JS -->
+                    </div>
+                </section>
+
+                <!-- Equipment View -->
+                <section id="equipment-view" class="view">
+                    <div class="view-header">
+                        <h1>إدارة المعدات</h1>
+                        <button class="btn-primary" onclick="openResourceModal('equipment')">+ إضافة معدات</button>
+                    </div>
+                    <div class="equipment-container full-grid" id="equipment-full-grid">
+                        <!-- Equipment Grid Rendered by JS -->
+                    </div>
+                </section>
+
+                <!-- Bookings List View -->
+                <section id="bookings-list-view" class="view">
+                    <div class="view-header">
+                        <h1>إدارة كافة الحجوزات</h1>
+                        <div class="action-buttons-group" style="display: flex; gap: 12px; align-items: center;">
+                            <button class="btn-secondary" onclick="runFormExport()" style="border-color: var(--primary-light); color: var(--primary-light);"><i class="fas fa-file-contract"></i> تصدير استمارة فارغة (HTM)</button>
+                            <button class="btn-secondary" onclick="printAllEvaluations()" style="border-color: #fbbf24; color: #fbbf24; background: rgba(251,191,36,0.05);"><i class="fas fa-star"></i> طباعة كافة التقييمات</button>
+                            <button class="btn-primary" id="print-bookings-btn" onclick="printAllBookings()"><i class="fas fa-print"></i> طباعة كافة الحجوزات</button>
+                        </div>
+                    </div>
+
+                    <!-- Filters and Sorting Controls Bar -->
+                    <div class="filter-controls-row" style="display: flex; gap: 15px; align-items: center; justify-content: flex-start; flex-wrap: wrap; margin-bottom: 2rem; background: rgba(255,255,255,0.02); padding: 12px 20px; border-radius: 12px; border: 1px solid var(--glass-border);">
+                        <div class="sort-group" style="display: flex; align-items: center; gap: 10px; background: var(--bg-card); padding: 5px 15px; border-radius: 12px; border: 1px solid var(--glass-border);">
+                            <label style="font-size: 0.8rem; color: var(--text-muted); white-space: nowrap;"><i class="fas fa-sort-amount-down-alt"></i> ترتيب حسب:</label>
+                            <select id="bookings-sort-select" onchange="handleBookingsSort(this.value)" style="background: transparent; color: white; border: none; outline: none; font-size: 0.9rem; cursor: pointer; padding: 5px;">
+                                <option value="priority" style="background: #1e293b;">الأولوية (تلقائي)</option>
+                                <option value="date-desc" style="background: #1e293b;">التاريخ (الأحدث)</option>
+                                <option value="date-asc" style="background: #1e293b;">التاريخ (الأقدم)</option>
+                                <option value="title" style="background: #1e293b;">مسمى الفعالية</option>
+                                <option value="entity" style="background: #1e293b;">الجهة المنظمة</option>
+                                <option value="room" style="background: #1e293b;">المقر</option>
+                                <option value="status" style="background: #1e293b;">الحالة</option>
+                            </select>
+                        </div>
+                        <div class="filter-group-status" style="display: flex; align-items: center; gap: 10px; background: var(--bg-card); padding: 5px 15px; border-radius: 12px; border: 1px solid var(--glass-border);">
+                            <label style="font-size: 0.8rem; color: var(--text-muted); white-space: nowrap;"><i class="fas fa-filter"></i> تصفية بالحالة:</label>
+                            <select id="bookings-status-filter" onchange="handleBookingsStatusFilter(this.value)" style="background: transparent; color: white; border: none; outline: none; font-size: 0.9rem; cursor: pointer; padding: 5px;">
+                                <option value="all" style="background: #1e293b;">كافة الحالات (الكل)</option>
+                                <option value="confirmed" style="background: #1e293b;">مؤكد</option>
+                                <option value="pending" style="background: #1e293b;">قيد الانتظار</option>
+                                <option value="executed" style="background: #1e293b;">تم التنفيذ</option>
+                                <option value="maintenance" style="background: #1e293b;">صيانة</option>
+                                <option value="cancelled" style="background: #1e293b;">ملغي</option>
+                            </select>
+                        </div>
+                        <div class="filter-group-room" style="display: flex; align-items: center; gap: 10px; background: var(--bg-card); padding: 5px 15px; border-radius: 12px; border: 1px solid var(--glass-border);">
+                            <label style="font-size: 0.8rem; color: var(--text-muted); white-space: nowrap;"><i class="fas fa-location-dot"></i> تصفية بالمقر:</label>
+                            <select id="bookings-room-filter" onchange="handleBookingsRoomFilter(this.value)" style="background: transparent; color: white; border: none; outline: none; font-size: 0.9rem; cursor: pointer; padding: 5px;">
+                                <option value="all" style="background: #1e293b;">كافة المقرات (الكل)</option>
+                            </select>
+                        </div>
+                        <div class="filter-group-date" style="display: flex; align-items: center; gap: 10px; background: var(--bg-card); padding: 5px 15px; border-radius: 12px; border: 1px solid var(--glass-border);">
+                            <label style="font-size: 0.8rem; color: var(--text-muted); white-space: nowrap;"><i class="fas fa-calendar-alt"></i> تصفية بالتاريخ:</label>
+                            <select id="bookings-date-filter" onchange="handleBookingsDateFilter(this.value)" style="background: transparent; color: white; border: none; outline: none; font-size: 0.9rem; cursor: pointer; padding: 5px;">
+                                <option value="all" style="background: #1e293b;">كافة الأوقات</option>
+                                <option value="today" style="background: #1e293b;">اليوم</option>
+                                <option value="week" style="background: #1e293b;">هذا الأسبوع</option>
+                                <option value="next-week" style="background: #1e293b;">الأسبوع القادم</option>
+                                <option value="month" style="background: #1e293b;">هذا الشهر</option>
+                                <option value="custom" style="background: #1e293b;">فترة مخصصة (من-إلى)</option>
+                            </select>
+                        </div>
+                        <div id="bookings-custom-range-container" style="display: none; align-items: center; gap: 10px; background: var(--bg-card); padding: 5px 15px; border-radius: 12px; border: 1px solid var(--glass-border);">
+                            <label style="font-size: 0.8rem; color: var(--text-muted);">من:</label>
+                            <input type="date" id="bookings-start-date" onchange="handleBookingsCustomDateChange()" style="background: transparent; color: white; border: none; outline: none; font-size: 0.9rem; cursor: pointer;">
+                            <label style="font-size: 0.8rem; color: var(--text-muted);">إلى:</label>
+                            <input type="date" id="bookings-end-date" onchange="handleBookingsCustomDateChange()" style="background: transparent; color: white; border: none; outline: none; font-size: 0.9rem; cursor: pointer;">
+                        </div>
+                    </div>
+                    <div class="bookings-table-container glass-card" id="bookings-table-container">
+                        <!-- Table of bookings will be here -->
+                    </div>
+                </section>
+
+                <!-- Calendar View -->
+                <section id="calendar-view" class="view">
+                    <div class="view-header calendar-header">
+                        <div class="calendar-title">
+                            <i class="fas fa-calendar-alt" style="color: var(--primary-light); margin-left: 10px; font-size: 1.5rem;"></i>
+                            <h1 id="calendar-month-year" style="display: inline-block;">إبريل 2026</h1>
+                        </div>
+                        <div class="calendar-nav" style="display: flex; gap: 10px; align-items: center;">
+                            <button class="nav-btn" onclick="prevMonth()" title="الشهر السابق"><i class="fas fa-chevron-right"></i></button>
+                            <button class="btn-secondary" onclick="goToToday()">اليوم</button>
+                            <button class="nav-btn" onclick="nextMonth()" title="الشهر التالي"><i class="fas fa-chevron-left"></i></button>
+                            <button class="btn-primary" style="margin-right: 15px;" onclick="printCalendar()"><i class="fas fa-print"></i> طباعة التقويم</button>
+                        </div>
+                    </div>
+                    <div class="calendar-container glass-card">
+                        <div class="calendar-weekdays">
+                            <div>السبت</div><div>الأحد</div><div>الإثنين</div><div>الثلاثاء</div><div>الأربعاء</div><div>الخميس</div><div>الجمعة</div>
+                        </div>
+                        <div class="calendar-grid" id="calendar-grid">
+                            <!-- JS will populate days here -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Reports View -->
+                <section id="reports-view" class="view">
+                    <div class="view-header">
+                        <h1>التقارير والتحليلات الإحصائية</h1>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn-primary" onclick="printComprehensiveReport()" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
+                                <i class="fas fa-file-pdf"></i> طباعة التقرير الشامل للمقرات والفعاليات
+                            </button>
+                            <button class="btn-secondary" onclick="window.print()"><i class="fas fa-print"></i> طباعة الشاشة الحالية</button>
+                        </div>
+                    </div>
+                    
+                    <div class="reports-filter-bar glass-card">
+                        <div class="filter-group" id="quick-filters">
+                            <button class="filter-btn active" data-period="all" onclick="updateReportFilter('all')">الكل</button>
+                            <button class="filter-btn" data-period="month" onclick="updateReportFilter('month')">هذا الشهر</button>
+                            <button class="filter-btn" data-period="year" onclick="updateReportFilter('year')">هذا العام</button>
+                        </div>
+                        <div class="filter-group" style="margin-right: 20px; border-right: 1px solid var(--glass-border); padding-right: 20px;">
+                            <label style="font-size: 0.85rem; margin-left: 10px; color: var(--text-muted);"><i class="fas fa-location-dot"></i> تصفية حسب المقر:</label>
+                            <select id="report-room-filter" onchange="updateReportFilter('custom')" style="background: rgba(15, 23, 42, 0.6); color: white; border: 1px solid var(--glass-border); border-radius: 8px; padding: 6px 15px; outline: none; cursor: pointer; font-family: 'Readex Pro', sans-serif; font-size: 0.85rem;">
+                                <option value="all">كافة المقرات</option>
+                            </select>
+                        </div>
+                        <div class="range-group">
+                            <div class="date-input">
+                                <label>من:</label>
+                                <input type="date" id="report-start-date">
+                            </div>
+                            <div class="date-input">
+                                <label>إلى:</label>
+                                <input type="date" id="report-end-date">
+                            </div>
+                            <button class="btn-secondary" onclick="updateReportFilter('custom')" style="padding: 8px 15px; border-radius: 8px;">
+                                <i class="fas fa-filter"></i> تصفية
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="reports-container">
+                        <div class="stats-grid" id="reports-kpi">
+                            <!-- Rendered by JS -->
+                        </div>
+                        
+                        <div class="reports-grid-main">
+                            <div class="glass-card chart-container">
+                                <div class="card-header">
+                                    <h3>معدل إشغال القاعات</h3>
+                                </div>
+                                <div class="bar-chart-wrapper" id="room-usage-bars">
+                                    <!-- Rendered by JS -->
+                                </div>
+                            </div>
+                            
+                            <div class="glass-card chart-container">
+                                <div class="card-header">
+                                    <h3>توزيع الحجوزات حسب الجهة</h3>
+                                </div>
+                                <div class="audience-circles" id="entity-dist-circles">
+                                    <!-- Rendered by JS -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reports-grid-secondary" style="grid-template-columns: 1fr 1fr 1fr;">
+                            <div class="glass-card">
+                                <div class="card-header">
+                                    <h3>تصنيف الفعاليات</h3>
+                                </div>
+                                <div class="tag-cloud" id="event-type-cloud">
+                                    <!-- Rendered by JS -->
+                                </div>
+                            </div>
+                            
+                            <div class="glass-card">
+                                <div class="card-header">
+                                    <h3>استهلاك الموارد والأجهزة</h3>
+                                </div>
+                                <div class="needs-ranking" id="needs-ranking-list">
+                                    <!-- Rendered by JS -->
+                                </div>
+                            </div>
+
+                            <div class="glass-card">
+                                <div class="card-header">
+                                    <h3>معدل الإشغال حسب الفترات</h3>
+                                </div>
+                                <div class="shift-comparison" id="shift-comparison-wrapper">
+                                    <!-- Rendered by JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Maintenance & Backup View -->
+                <section id="maintenance-view" class="view">
+                    <div class="view-header">
+                        <h1>صيانة النظام والنسخ الاحتياطي</h1>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">أدوات تأمين البيانات وحفظ نسخ شاملة للمشروع</p>
+                    </div>
+
+                    <div class="maintenance-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+                        <!-- Full Backup Card -->
+                        <div class="glass-card" style="padding: 25px;">
+                            <div style="display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px;">
+                                <div style="width: 50px; height: 50px; background: rgba(99, 102, 241, 0.2); color: var(--primary-light); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                                    <i class="fas fa-file-archive"></i>
+                                </div>
+                                <div>
+                                    <h3 style="margin-bottom: 5px;">النسخة الاحتياطية الشاملة</h3>
+                                    <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.5;">حفظ نسخة كاملة من كافة الملفات البرمجية والأكواد والتعديلات في ملف مضغوط (ZIP).</p>
+                                </div>
+                            </div>
+                            <button class="btn-primary" style="width: 100%; border-radius: 10px; padding: 12px;" onclick="runProjectBackup()">
+                                <i class="fas fa-save" style="margin-left: 8px;"></i> إنشاء نسخة شاملة (.zip)
+                            </button>
+                        </div>
+
+                        <!-- Data Export Card -->
+                        <div class="glass-card" style="padding: 25px;">
+                            <div style="display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px;">
+                                <div style="width: 50px; height: 50px; background: rgba(16, 185, 129, 0.2); color: #10b981; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                                    <i class="fas fa-file-export"></i>
+                                </div>
+                                <div>
+                                    <h3 style="margin-bottom: 5px;">تصدير بيانات النظام</h3>
+                                    <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.5;">تصدير كافة الحجوزات، المقرات، والمعدات التي تمت إضافتها في ملف بيانات خارجي (JSON).</p>
+                                </div>
+                            </div>
+                            <button class="btn-secondary" style="width: 100%; border-color: #10b981; color: #10b981; border-radius: 10px; padding: 12px;" onclick="runDataExport()">
+                                <i class="fas fa-download" style="margin-left: 8px;"></i> تصدير البيانات (.json)
+                            </button>
+                        </div>
+
+                        <!-- Form Export Card -->
+                        <div class="glass-card" style="padding: 25px;">
+                            <div style="display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px;">
+                                <div style="width: 50px; height: 50px; background: rgba(99, 102, 241, 0.2); color: #6366f1; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                                    <i class="fas fa-file-contract"></i>
+                                </div>
+                                <div>
+                                    <h3 style="margin-bottom: 5px;">تصدير نموذج الطلب الرقمي</h3>
+                                    <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.5;">تصدير نسخة مستقلة من نموذج الحجز بصيغة (HTM) لإرسالها للجهات لتعبئتها.</p>
+                                </div>
+                            </div>
+                            <button class="btn-secondary" style="width: 100%; border-color: #6366f1; color: #6366f1; border-radius: 10px; padding: 12px;" onclick="runFormExport()">
+                                <i class="fas fa-file-export" style="margin-left: 8px;"></i> تصدير النموذج الفارغ (.htm)
+                            </button>
+                        </div>
+
+                        <!-- Data Import Card -->
+                        <div class="glass-card" style="padding: 25px;">
+                            <div style="display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px;">
+                                <div style="width: 50px; height: 50px; background: rgba(245, 158, 11, 0.2); color: #f59e0b; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                                    <i class="fas fa-file-import"></i>
+                                </div>
+                                <div>
+                                    <h3 style="margin-bottom: 5px;">استيراد بيانات خارجية</h3>
+                                    <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.5;">استعادة بيانات النظام من نسخة سابقة تم تصديرها. ملاحظة: هذا سيستبدل البيانات الحالية.</p>
+                                </div>
+                            </div>
+                            <button class="btn-secondary" style="width: 100%; border-color: #f59e0b; color: #f59e0b; border-radius: 10px; padding: 12px;" onclick="runDataImport()">
+                                <i class="fas fa-upload" style="margin-left: 8px;"></i> استيراد نسخة سابقة
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="maintenance-status" style="margin-top: 30px; padding: 15px; border-radius: 12px; display: none; text-align: center; font-weight: bold;">
+                        <!-- Message via JS -->
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="room-modal" class="modal"></div>
+
+    <!-- Detailed Official Booking Modal -->
+    <div id="booking-detail-modal" class="modal-overlay">
+        <div class="modal-content glass-card" style="max-width: 850px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div style="flex: 1;">
+                    <h2 id="booking-modal-title" style="color: var(--primary-light); margin-bottom: 5px;">نموذج طلب حجز فعالية</h2>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">يرجى ملء البيانات الرسمية المطلوبة بدقة</p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button type="button" id="pdf-import-btn" onclick="document.getElementById('pdf-import-input').click()" style="background: linear-gradient(135deg, #6366f1, #a855f7); color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); transition: all 0.3s ease;">
+                        <i class="fas fa-file-pdf"></i> استيراد من PDF
+                    </button>
+                    <input type="file" id="pdf-import-input" accept=".pdf" style="display: none;" onchange="handlePDFImport(event)">
+                    
+                    <button type="button" id="json-import-btn" onclick="document.getElementById('json-import-input').click()" style="background: linear-gradient(135deg, #10b981, #3b82f6); color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); transition: all 0.3s ease;">
+                        <i class="fas fa-file-code"></i> استيراد من JSON
+                    </button>
+                    <input type="file" id="json-import-input" accept=".json" style="display: none;" onchange="handleJSONImport(event)">
+                    <button class="close-modal" type="button" onclick="closeBookingModal()" style="font-size: 2.5rem; line-height: 1; padding: 0; margin-top: -5px;">&times;</button>
+                </div>
+            </div>
+            <form id="booking-form" onsubmit="handleBookingSubmit(event)">
+                <input type="hidden" id="book-id">
+                <input type="hidden" id="book-room-id">
+                
+                <!-- Section 1: الجهة المستفيدة -->
+                <div class="form-section">
+                    <h3 class="section-title"><i class="fas fa-building"></i> بيانات الجهة</h3>
+                    <div class="form-row grid-3">
+                        <div class="form-group">
+                            <label>نوع الجهة</label>
+                            <select id="book-entity-type">
+                                <option value="management">إدارة / قسم / وحدة</option>
+                                <option value="school">مدرسة</option>
+                                <option value="other">أخرى</option>
+                            </select>
+                        </div>
+                        <div class="form-group span-2">
+                            <label>اسم الجهة</label>
+                            <input type="text" id="book-entity-name" placeholder="أدخل اسم الجهة بالتفصيل" required>
+                        </div>
+                    </div>
+                    <div class="form-row grid-3">
+                        <div class="form-group">
+                            <label>اسم مسؤول التنسيق</label>
+                            <input type="text" id="book-coord-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>رقم الجوال</label>
+                            <input type="tel" id="book-coord-mobile" placeholder="05xxxxxxxx" required>
+                        </div>
+                        <div class="form-group">
+                            <label>حالة الطلب</label>
+                            <select id="book-status">
+                                <option value="confirmed">مؤكد</option>
+                                <option value="pending" selected>قيد الانتظار</option>
+                                <option value="executed">تم التنفيذ</option>
+                                <option value="maintenance">صيانة</option>
+                                <option value="cancelled">ملغي</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: زمان ومكان الفعالية -->
+                <div class="form-section">
+                    <h3 class="section-title"><i class="fas fa-clock"></i> توقيت ومقر الفعالية</h3>
+                    <div class="form-row grid-3">
+                        <div class="form-group">
+                            <label>المقر / القاعة</label>
+                            <div id="book-room-selector-container">
+                                <!-- سيتم تعبئته ديناميكياً بواسطة JS (كإدخال للقراءة فقط أو قائمة اختيار) -->
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>التاريخ (ميلادي)</label>
+                            <input type="date" id="book-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>التاريخ (هجري)</label>
+                            <input type="text" id="book-date-hijri" placeholder="1446 / / ">
+                        </div>
+                    </div>
+                    <div class="form-row grid-3">
+                        <div class="form-group">
+                            <label>وقت الفعالية</label>
+                            <div class="radio-group" style="display: flex; gap: 10px; margin-top: 5px;">
+                                <label style="display: flex; gap: 5px; font-size: 0.8rem;"><input type="radio" name="time-period" value="morning" checked> صباحاً</label>
+                                <label style="display: flex; gap: 5px; font-size: 0.8rem;"><input type="radio" name="time-period" value="evening"> مساءً</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>الساعة</label>
+                            <input type="time" id="book-time" required>
+                        </div>
+                        <div class="form-group">
+                            <label>مدة الفعالية (ساعات)</label>
+                            <input type="number" id="book-duration" value="2" min="1">
+                        </div>
+                    </div>
+                    <div class="form-row grid-3">
+                        <div class="form-group">
+                            <label>فئة الحضور</label>
+                            <select id="book-audience-type">
+                                <option value="boys">بنين</option>
+                                <option value="girls">بنات</option>
+                                <option value="mixed">عام</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>العدد المتوقع</label>
+                            <input type="number" id="book-audience-count" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label>عدد الحضور الفعلي</label>
+                            <input type="number" id="book-actual-count" placeholder="0">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: نوع وتفاصيل الفعالية -->
+                <div class="form-section">
+                    <h3 class="section-title"><i class="fas fa-info-circle"></i> تفاصيل الفعالية</h3>
+                    <div class="form-group">
+                        <label>نوع الفعالية</label>
+                        <div class="checkbox-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                            <label class="check-item"><input type="checkbox" name="event-type" value="visit"> زيارة وفد</label>
+                            <label class="check-item"><input type="checkbox" name="event-type" value="meeting"> لقاء</label>
+                            <label class="check-item"><input type="checkbox" name="event-type" value="ministerial"> برنامج وزاري</label>
+                            <label class="check-item"><input type="checkbox" name="event-type" value="internal"> برنامج داخلي</label>
+                            <label class="check-item"><input type="checkbox" name="event-type" value="workshop"> ورشة عمل</label>
+                            <label class="check-item"><input type="checkbox" name="event-type" value="opening"> افتتاح</label>
+                            <label class="check-item"><input type="checkbox" name="event-type" value="party"> حفل</label>
+                            <label class="check-item" style="grid-column: span 2; display: flex; align-items: center; gap: 10px; background: rgba(99, 102, 241, 0.05); border: 1px dashed var(--primary-light);">
+                                <input type="checkbox" name="event-type" value="other" id="event-type-other-checkbox" onchange="window.toggleOtherEventTypeInput()">
+                                <span style="white-space: nowrap;">أخرى:</span>
+                                <input type="text" id="book-other-event-type" placeholder="اكتب هنا..." style="flex-grow: 1; padding: 5px 10px; border-radius: 6px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.1); color: white; font-size: 0.8rem;">
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>اسم الفعالية</label>
+                        <input type="text" id="book-event-title" placeholder="أدخل المسمى الرسمي للفعالية" required>
+                    </div>
+                    <div class="form-row grid-2">
+                        <div class="form-group">
+                            <label>الضيف الاعتباري / الراعي</label>
+                            <input type="text" id="book-vip-guest">
+                        </div>
+                        <div class="form-group">
+                            <label>الفعاليات المصاحبة</label>
+                            <input type="text" id="book-activities">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: الاحتياجات -->
+                <div class="form-section">
+                    <h3 class="section-title"><i class="fas fa-tools"></i> احتياجات المبادرة / الفعالية</h3>
+                    <div class="checkbox-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                        <label class="check-item"><input type="checkbox" name="need" value="screens"> شاشات عرض</label>
+                        <label class="check-item"><input type="checkbox" name="need" value="audio"> صوتيات</label>
+                        <label class="check-item"><input type="checkbox" name="need" value="mic"> ميكروفونات</label>
+                        <label class="check-item"><input type="checkbox" name="need" value="pc"> أجهزة كمبيوتر</label>
+                        <label class="check-item"><input type="checkbox" name="need" value="photo"> تصوير فيديو/فوتوغرافي</label>
+                        <label class="check-item"><input type="checkbox" name="need" value="org"> تنظيم</label>
+                        <label class="check-item"><input type="checkbox" name="need" value="ministry"> ربط مع الوزارة</label>
+                        <label class="check-item"><input type="checkbox" name="need" value="live"> البث المباشر</label>
+                        <label class="check-item"><input type="checkbox" name="need" value="other_need"> أخرى</label>
+                    </div>
+                    <div class="form-group" style="margin-top: 15px;">
+                        <input type="text" id="book-other-needs-text" placeholder="ملاحظات أخرى للاحتياجات (إن وجد)">
+                    </div>
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label class="check-item" style="width: 100%; border: 1.5px solid var(--primary); background: rgba(99, 102, 241, 0.1); padding: 12px; font-weight: bold; color: var(--primary-light); display: flex; align-items: center; gap: 10px;">
+                            <input type="checkbox" id="book-show-approval" checked style="width: 20px; height: 20px; accent-color: var(--primary);">
+                            <i class="fas fa-file-signature"></i> إظهار قسم (الاعتماد) في التقرير النهائي
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-actions" style="position: sticky; bottom: -20px; background: var(--bg-card); padding: 20px 0; border-top: 1px solid var(--glass-border); margin-top: 30px; backdrop-filter: blur(10px); display: flex; justify-content: flex-end; gap: 12px;">
+                    <button type="button" class="btn-secondary" onclick="closeBookingModal()">إلغاء</button>
+                    <button type="button" class="btn-secondary" onclick="sendWhatsAppMessageFromForm()" style="background: rgba(37, 211, 102, 0.1); color: #25D366; border-color: rgba(37, 211, 102, 0.2);"><i class="fab fa-whatsapp"></i> إرسال واتساب</button>
+                    <button type="button" class="btn-secondary" onclick="printCurrentBookingForm()" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239, 68, 68, 0.2);"><i class="fas fa-file-pdf"></i> حفظ كـ PDF</button>
+                    <button type="button" class="btn-secondary" onclick="printCurrentBookingForm()" style="background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.2);"><i class="fas fa-print"></i> طباعة الطلب</button>
+                    <button type="submit" class="btn-primary" style="padding: 12px 40px;"><i class="fas fa-check"></i> تأكيد وحفظ الطلب</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dedicated Maintenance Form Modal -->
+    <div id="maintenance-form-modal" class="modal-overlay">
+        <div class="modal-content glass-card" style="max-width: 650px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div>
+                    <h2 style="color: var(--warning); margin-bottom: 5px;"><i class="fas fa-screwdriver-wrench"></i> طلب أعمال صيانة وإصلاح</h2>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">تسجيل طلب صيانة مخصص لمقر أو قاعة أو مسرح</p>
+                </div>
+                <button class="close-modal" type="button" onclick="closeMaintenanceFormModal()" style="font-size: 2.5rem; line-height: 1; padding: 0; margin-top: -5px;">&times;</button>
+            </div>
+            <form id="maintenance-form" onsubmit="handleMaintenanceFormSubmit(event)">
+                <input type="hidden" id="maint-id">
+                
+                <div class="form-section">
+                    <h3 class="section-title" style="color: var(--warning); border-bottom: 1px solid rgba(245, 158, 11, 0.2);"><i class="fas fa-cubes"></i> تحديد المقر ونوع العطل</h3>
+                    
+                    <div class="form-row grid-2">
+                        <div class="form-group">
+                            <label>المقر / القاعة / المسرح</label>
+                            <select id="maint-room-id" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: #1e293b; color: white;">
+                                <!-- Will be populated by JS -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>تصنيف أعمال الصيانة</label>
+                            <select id="maint-type" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: #1e293b; color: white;">
+                                <option value="audio">صيانة الصوتيات والأنظمة الصوتية</option>
+                                <option value="screens">صيانة شاشات العرض والبروجكتر</option>
+                                <option value="ac">صيانة التكييف والتهوية</option>
+                                <option value="electrical">صيانة الإضاءة والكهرباء</option>
+                                <option value="furniture">صيانة الأثاث والمقاعد والديكور</option>
+                                <option value="cleaning">أعمال نظافة وتهيئة عامة</option>
+                                <option value="other">أعمال صيانة وتجهيز أخرى</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row grid-3">
+                        <div class="form-group">
+                            <label>تاريخ الصيانة</label>
+                            <input type="date" id="maint-date" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); background: #1e293b; color: white;">
+                        </div>
+                        <div class="form-group">
+                            <label>توقيت الصيانة</label>
+                            <div class="radio-group" style="display: flex; gap: 10px; margin-top: 8px;">
+                                <label style="display: flex; gap: 5px; font-size: 0.8rem; color: white; cursor: pointer;"><input type="radio" name="maint-period" value="morning" checked> صباحاً</label>
+                                <label style="display: flex; gap: 5px; font-size: 0.8rem; color: white; cursor: pointer;"><input type="radio" name="maint-period" value="evening"> مساءً</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>مستوى الأولوية والخطورة</label>
+                            <select id="maint-priority" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); background: #1e293b; color: white;">
+                                <option value="normal">عادي / مجدول</option>
+                                <option value="medium">متوسط الأهمية</option>
+                                <option value="urgent" style="color: #ef4444; font-weight: bold;">عاجل / طارئ جداً ⚠️</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title" style="color: var(--warning); border-bottom: 1px solid rgba(245, 158, 11, 0.2);"><i class="fas fa-tools"></i> تفاصيل المسؤولية ومتابعة البلاغ</h3>
+                    
+                    <div class="form-row grid-2">
+                        <div class="form-group">
+                            <label>فني أو مشرف الصيانة المسؤول</label>
+                            <input type="text" id="maint-technician" value="فريق الصيانة والتشغيل" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); background: #1e293b; color: white;">
+                        </div>
+                        <div class="form-group">
+                            <label>جوال المشرف المسؤول</label>
+                            <input type="tel" id="maint-tech-mobile" value="05XXXXXXXX" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); background: #1e293b; color: white;">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label>وصف دقيق للعطل / الأعمال المطلوبة</label>
+                        <textarea id="maint-desc" rows="4" placeholder="يرجى كتابة تفاصيل العطل ونوع القطع المراد إصلاحها أو صيانتها لتمكين فريق الصيانة من التجهيز المسبق..." required style="width: 100%; background: rgba(255,255,255,0.02); color: white; border: 1px solid var(--glass-border); border-radius: 12px; padding: 15px; font-size: 0.9rem; line-height: 1.6;"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions" style="position: sticky; bottom: -20px; background: var(--bg-card); padding: 20px 0; border-top: 1px solid var(--glass-border); margin-top: 30px; backdrop-filter: blur(10px); display: flex; justify-content: flex-end; gap: 12px;">
+                    <button type="button" class="btn-secondary" onclick="closeMaintenanceFormModal()">إلغاء</button>
+                    <button type="submit" class="btn-primary" style="padding: 12px 40px; background: linear-gradient(135deg, var(--warning), #d97706); border-color: var(--warning); box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);"><i class="fas fa-check"></i> حفظ طلب الصيانة وحظر المقر</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Booking Details Modal -->
+    <div id="view-booking-modal" class="modal-overlay">
+        <div class="modal-content glass-card" style="max-width: 750px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h2>تفاصيل طلب الحجز المعتمد</h2>
+                <button class="close-modal" onclick="closeViewModal()">&times;</button>
+            </div>
+            <div id="view-booking-content" class="p-4">
+                <!-- Data populated by JS -->
+            </div>
+            
+            <div class="form-section status-update-section" style="padding: 15px; background: rgba(99, 102, 241, 0.05); border-radius: 12px; margin: 10px 20px;">
+                <label style="font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; display: block;">تحديث حالة الحجز:</label>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn-secondary" onclick="updateBookingStatusDirectly('confirmed')" style="flex: 1; min-width: 110px; white-space: nowrap; font-size: 0.8rem; border-color: var(--accent); color: var(--accent);"><i class="fas fa-check"></i> تأكيد حجز</button>
+                    <button class="btn-secondary" onclick="updateBookingStatusDirectly('executed')" style="flex: 1; min-width: 110px; white-space: nowrap; font-size: 0.8rem; border-color: #6366f1; color: #6366f1;"><i class="fas fa-calendar-check"></i> تم التنفيذ</button>
+                    <button class="btn-secondary" onclick="updateBookingStatusDirectly('pending')" style="flex: 1; min-width: 110px; white-space: nowrap; font-size: 0.8rem; border-color: var(--warning); color: var(--warning);"><i class="fas fa-clock"></i> تعليق (انتظار)</button>
+                    <button class="btn-secondary" onclick="updateBookingStatusDirectly('maintenance')" style="flex: 1; min-width: 110px; white-space: nowrap; font-size: 0.8rem; border-color: #f97316; color: #f97316;"><i class="fas fa-tools"></i> صيانة</button>
+                    <button class="btn-secondary" onclick="updateBookingStatusDirectly('cancelled')" style="flex: 1; min-width: 110px; white-space: nowrap; font-size: 0.8rem; border-color: var(--danger); color: var(--danger);"><i class="fas fa-times"></i> إلغاء الحجز</button>
+                </div>
+            </div>
+
+            <div class="form-section" style="padding: 15px; background: rgba(37, 211, 102, 0.05); border-radius: 12px; margin: 10px 20px; border: 1px solid rgba(37, 211, 102, 0.15);">
+                <label style="font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; display: block; color: #25D366;"><i class="fab fa-whatsapp" style="margin-left: 5px;"></i> إشعار المنسق عبر واتساب:</label>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn-secondary" onclick="sendWhatsAppConfirmation(parseInt(document.getElementById('evaluation-book-id').value))" style="flex: 1; min-width: 140px; white-space: nowrap; font-size: 0.8rem; border-color: #25D366; color: #25D366; background: rgba(37, 211, 102, 0.08);"><i class="fab fa-whatsapp"></i> إرسال تأكيد حجز</button>
+                    <button class="btn-secondary" onclick="sendWhatsAppCancellation(parseInt(document.getElementById('evaluation-book-id').value))" style="flex: 1; min-width: 140px; white-space: nowrap; font-size: 0.8rem; border-color: #ef4444; color: #ef4444; background: rgba(239, 68, 68, 0.08);"><i class="fab fa-whatsapp"></i> إرسال إشعار إلغاء</button>
+                </div>
+            </div>
+            
+            <div id="evaluation-section" class="form-section evaluation-area" style="padding: 20px; border-top: 1px solid var(--glass-border); margin-top: 20px;">
+                <style>
+                    .eval-chip {
+                        font-family: 'Readex Pro', sans-serif;
+                        font-size: 0.75rem;
+                        padding: 6px 12px;
+                        border-radius: 20px;
+                        cursor: pointer;
+                        background: rgba(255, 255, 255, 0.03);
+                        border: 1px solid var(--glass-border);
+                        color: var(--text-muted);
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 6px;
+                        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+                        outline: none;
+                        margin-top: 5px;
+                        user-select: none;
+                    }
+                    .eval-chip:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+                    }
+                    .success-chip {
+                        border-color: rgba(16, 185, 129, 0.2);
+                        background: rgba(16, 185, 129, 0.04);
+                        color: #10b981;
+                    }
+                    .success-chip:hover {
+                        background: rgba(16, 185, 129, 0.15);
+                        border-color: #10b981;
+                        color: #fff;
+                    }
+                    .danger-chip {
+                        border-color: rgba(239, 68, 68, 0.2);
+                        background: rgba(239, 68, 68, 0.04);
+                        color: #ef4444;
+                    }
+                    .danger-chip:hover {
+                        background: rgba(239, 68, 68, 0.15);
+                        border-color: #ef4444;
+                        color: #fff;
+                    }
+                    .primary-chip {
+                        border-color: rgba(99, 102, 241, 0.2);
+                        background: rgba(99, 102, 241, 0.04);
+                        color: #818cf8;
+                    }
+                    .primary-chip:hover {
+                        background: rgba(99, 102, 241, 0.15);
+                        border-color: #818cf8;
+                        color: #fff;
+                    }
+                    .eval-chip .chip-delete {
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 14px;
+                        height: 14px;
+                        border-radius: 50%;
+                        background: rgba(255, 255, 255, 0.15);
+                        color: inherit;
+                        font-size: 0.75rem;
+                        line-height: 1;
+                        transition: all 0.2s ease;
+                        cursor: pointer;
+                        margin-right: 4px;
+                        margin-left: -2px;
+                    }
+                    .eval-chip .chip-delete:hover {
+                        background: #ef4444 !important;
+                        color: white !important;
+                    }
+                </style>
+                <h3 class="section-title"><i class="fas fa-chart-line"></i> تقييم الفعالية والتقرير الختامي</h3>
+                <input type="hidden" id="evaluation-book-id">
+                
+                <!-- مساعد التقييم الذكي -->
+                <div class="evaluation-assistant" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border); border-radius: 12px; padding: 15px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 12px;">
+                        <span style="font-weight: 700; color: var(--primary-light); font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-magic" style="color: #fbbf24;"></i> مساعد التقييم الذكي (خيارات سريعة للتعبئة)
+                        </span>
+                        <div style="display: flex; gap: 10px;">
+                            <button type="button" class="btn-primary" onclick="fillSpecificReportPreset()" style="padding: 6px 15px; font-size: 0.8rem; background: linear-gradient(135deg, #10b981, #059669); border-color: #10b981; border-radius: 8px; cursor: pointer;">
+                                <i class="fas fa-bolt"></i> تعبئة نموذج الحدث الحالي (تلقائي)
+                            </button>
+                            <button type="button" class="btn-secondary" onclick="clearEvaluationFields()" style="padding: 6px 15px; font-size: 0.8rem; border-color: var(--danger); color: var(--danger); border-radius: 8px; background: transparent; cursor: pointer;">
+                                <i class="fas fa-eraser"></i> مسح الحقول
+                            </button>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">
+                        💡 يمكنك تعبئة التقرير فوراً للحدث الحالي، أو الضغط على الكلمات المفتاحية (البطاقات القياسية) أسفل كل صندوق حوار لإضافتها للتقرير تلقائياً مع المحافظة على النصوص السابقة.
+                    </p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 8px; color: #10b981; font-weight: 700; margin-bottom: 10px;">
+                            <i class="fas fa-plus-circle"></i> الإيجابيات / نقاط القوة
+                        </label>
+                        <textarea id="book-positives" rows="6" placeholder="ما هي أبرز نقاط القوة والنجاح في هذه الفعالية؟" style="width: 100%; background: rgba(16, 185, 129, 0.03); color: white; border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 12px; padding: 15px; font-size: 0.9rem; line-height: 1.6;"></textarea>
+                        
+                        <!-- حاوية بطاقات الإيجابيات الديناميكية -->
+                        <div class="eval-preset-chips" id="positives-presets-container" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;"></div>
+                        
+                        <!-- نموذج إضافة معيار مخصص للإيجابيات -->
+                        <div id="add-preset-form-positives" class="add-preset-form" style="display: none; background: rgba(255,255,255,0.02); border: 1px dashed var(--glass-border); border-radius: 8px; padding: 12px; margin-top: 10px; width: 100%; box-sizing: border-box;">
+                            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 10px; margin-bottom: 10px;">
+                                <input type="text" id="new-preset-title-positives" placeholder="مسمى المعيار (مثال: تفاعل المدرب)" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: #1e293b; color: white; font-size: 0.8rem; outline: none; width: 100%; box-sizing: border-box;">
+                                <input type="text" id="new-preset-content-positives" placeholder="التفاصيل (مثال: تميز اللقاء بالتفاعل المستمر والممتاز)" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: #1e293b; color: white; font-size: 0.8rem; outline: none; width: 100%; box-sizing: border-box;">
+                            </div>
+                            <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                                <button type="button" class="btn-secondary" onclick="window.toggleAddPresetForm('positives')" style="padding: 5px 12px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: white;">إلغاء</button>
+                                <button type="button" class="btn-primary" onclick="window.addEvaluationPreset('positives')" style="padding: 5px 15px; font-size: 0.75rem; background: var(--primary); border-color: var(--primary); border-radius: 6px; cursor: pointer; color: white;">حفظ البند</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 8px; color: #ef4444; font-weight: 700; margin-bottom: 10px;">
+                            <i class="fas fa-minus-circle"></i> السلبيات / ملاحظات التحسين
+                        </label>
+                        <textarea id="book-negatives" rows="6" placeholder="ما هي التحديات أو السلبيات التي واجهتكم؟" style="width: 100%; background: rgba(239, 68, 68, 0.03); color: white; border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; padding: 15px; font-size: 0.9rem; line-height: 1.6;"></textarea>
+                        
+                        <!-- حاوية بطاقات السلبيات الديناميكية -->
+                        <div class="eval-preset-chips" id="negatives-presets-container" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;"></div>
+                        
+                        <!-- نموذج إضافة معيار مخصص للسلبيات -->
+                        <div id="add-preset-form-negatives" class="add-preset-form" style="display: none; background: rgba(255,255,255,0.02); border: 1px dashed var(--glass-border); border-radius: 8px; padding: 12px; margin-top: 10px; width: 100%; box-sizing: border-box;">
+                            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 10px; margin-bottom: 10px;">
+                                <input type="text" id="new-preset-title-negatives" placeholder="مسمى المعيار (مثال: عطل الصوت)" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: #1e293b; color: white; font-size: 0.8rem; outline: none; width: 100%; box-sizing: border-box;">
+                                <input type="text" id="new-preset-content-negatives" placeholder="التفاصيل (مثال: حدوث تقطع مفاجئ في أنظمة الصوت)" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: #1e293b; color: white; font-size: 0.8rem; outline: none; width: 100%; box-sizing: border-box;">
+                            </div>
+                            <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                                <button type="button" class="btn-secondary" onclick="window.toggleAddPresetForm('negatives')" style="padding: 5px 12px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: white;">إلغاء</button>
+                                <button type="button" class="btn-primary" onclick="window.addEvaluationPreset('negatives')" style="padding: 5px 15px; font-size: 0.75rem; background: var(--primary); border-color: var(--primary); border-radius: 6px; cursor: pointer; color: white;">حفظ البند</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <label style="display: flex; align-items: center; gap: 8px; color: var(--primary-light); font-weight: 700; margin-bottom: 10px;">
+                        <i class="fas fa-lightbulb"></i> التوصيات والمقترحات التطويرية
+                    </label>
+                    <textarea id="book-recommendations" rows="5" placeholder="اكتب هنا التوصيات المقترحة لتفادي السلبيات أو تطوير الفعاليات القادمة..." style="width: 100%; background: rgba(99, 102, 241, 0.03); color: white; border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 12px; padding: 15px; font-size: 0.9rem; line-height: 1.6;"></textarea>
+                    
+                    <!-- حاوية بطاقات التوصيات الديناميكية -->
+                    <div class="eval-preset-chips" id="recommendations-presets-container" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;"></div>
+                    
+                    <!-- نموذج إضافة معيار مخصص للتوصيات -->
+                    <div id="add-preset-form-recommendations" class="add-preset-form" style="display: none; background: rgba(255,255,255,0.02); border: 1px dashed var(--glass-border); border-radius: 8px; padding: 12px; margin-top: 10px; width: 100%; box-sizing: border-box;">
+                        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 10px; margin-bottom: 10px;">
+                            <input type="text" id="new-preset-title-recommendations" placeholder="مسمى المعيار (مثال: صيانة المكيفات)" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: #1e293b; color: white; font-size: 0.8rem; outline: none; width: 100%; box-sizing: border-box;">
+                            <input type="text" id="new-preset-content-recommendations" placeholder="التفاصيل (مثال: جدولة الصيانة الدورية للتكييف قبل الفعاليات)" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: #1e293b; color: white; font-size: 0.8rem; outline: none; width: 100%; box-sizing: border-box;">
+                        </div>
+                        <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                            <button type="button" class="btn-secondary" onclick="window.toggleAddPresetForm('recommendations')" style="padding: 5px 12px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: white;">إلغاء</button>
+                            <button type="button" class="btn-primary" onclick="window.addEvaluationPreset('recommendations')" style="padding: 5px 15px; font-size: 0.75rem; background: var(--primary); border-color: var(--primary); border-radius: 6px; cursor: pointer; color: white;">حفظ البند</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <label style="display: flex; align-items: center; gap: 8px; color: var(--primary-light); font-weight: 700; margin-bottom: 10px;">
+                        <i class="fas fa-camera"></i> الشواهد المرئية للفعالية
+                    </label>
+                    <div style="background: rgba(255,255,255,0.02); border: 1px dashed var(--glass-border); border-radius: 12px; padding: 15px; text-align: center;">
+                        <input type="file" id="event-evidence-upload" multiple accept="image/*" style="display: none;" onchange="handleEventEvidenceUpload(event)">
+                        <button type="button" class="btn-secondary" onclick="document.getElementById('event-evidence-upload').click()" style="padding: 8px 16px; font-size: 0.85rem; border-color: var(--primary-light); color: var(--primary-light); background: transparent; cursor: pointer; border-radius: 8px;">
+                            <i class="fas fa-upload"></i> إضافة شواهد مرئية للفعالية
+                        </button>
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px; margin-bottom: 0;">يمكنك اختيار صورة أو أكثر لإدراجها في تقرير الفعالية</p>
+                        <div id="event-evidence-thumbnails" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; justify-content: center;">
+                            <!-- Event evidence thumbnails will be injected here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: flex-start; flex-wrap: wrap; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; width: 100%; box-sizing: border-box;">
+                    <button class="btn-primary" onclick="saveEventSummary()" style="flex: 2; min-width: 160px; white-space: nowrap;"><i class="fas fa-save"></i> حفظ التقييم والنتائج</button>
+                    <button class="btn-secondary" onclick="printShortReport()" style="flex: 1; min-width: 120px; border-color: #ef4444; color: #ef4444; background: rgba(239, 68, 68, 0.05); white-space: nowrap;"><i class="fas fa-file-pdf"></i> حفظ كـ PDF</button>
+                    <button class="btn-secondary" onclick="shareToWhatsApp()" style="flex: 1; min-width: 120px; background: rgba(37, 211, 102, 0.15); color: #25D366; border-color: rgba(37, 211, 102, 0.3); white-space: nowrap;"><i class="fab fa-whatsapp"></i> واتساب</button>
+                    <button class="btn-secondary" onclick="printShortReport()" style="flex: 1; min-width: 120px; border-color: var(--primary-light); color: var(--primary-light); white-space: nowrap;"><i class="fas fa-print"></i> طباعة التقرير</button>
+                </div>
+            </div>
+            
+            <div class="modal-footer" style="padding: 20px; border-top: 1px solid var(--glass-border); display: flex; justify-content: flex-end;">
+                <button class="btn-secondary" onclick="closeViewModal()">إغلاق النافذة</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Short Report Print Template (Hidden) - Unified Modern Design -->
+    <div id="short-report-print-template" class="print-template print-theme-blue" style="display: none;">
+        <div class="print-page-unified print-theme-blue">
+            <!-- Header -->
+            <div class="print-header-unified">
+                <div class="header-right-info">
+                    المملكة العربية السعودية<br>
+                    وزارة التعليم<br>
+                    <span class="dynamic-org-name">الإدارة العامة للتعليم</span><br>
+                    <span class="dynamic-dept-name">إدارة الاتصال المؤسسي</span>
+                </div>
+                <div class="header-center-logo-place"></div>
+                <div class="header-left-logo-container dynamic-print-logo-container">
+                    <!-- Logo via JS -->
+                </div>
+            </div>
+
+            <!-- Report Title -->
+            <div class="print-title-badge-container">
+                <div class="print-title-badge-unified">تقرير تقييم فعالية</div>
+            </div>
+
+            <!-- Event Summary Info -->
+            <div class="print-info-box-unified">
+                <table class="print-info-table-unified">
+                    <tr>
+                        <td class="label">مسمى الفعالية:</td>
+                        <td id="rpt-title" class="value"></td>
+                    </tr>
+                    <tr>
+                        <td class="label">الجهة المنظمة:</td>
+                        <td id="rpt-entity" class="value"></td>
+                    </tr>
+                    <tr>
+                        <td class="label">تاريخ التنفيذ:</td>
+                        <td id="rpt-date" class="value"></td>
+                    </tr>
+                    <tr>
+                        <td class="label">تاريخ التقرير:</td>
+                        <td id="rpt-today" class="value"></td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Content Sections -->
+            <div class="print-section-unified">
+                <div class="print-section-title-unified"><i class="fas fa-plus-circle"></i> الإيجابيات ومكاسب الفعالية</div>
+                <div id="rpt-positives" style="padding: 10px; line-height: 1.8; font-size: 1.05rem; min-height: 120px; white-space: pre-wrap;"></div>
+            </div>
+
+            <div class="print-section-unified">
+                <div class="print-section-title-unified"><i class="fas fa-minus-circle"></i> السلبيات وملاحظات التحسين</div>
+                <div id="rpt-negatives" style="padding: 10px; line-height: 1.8; font-size: 1.05rem; min-height: 100px; white-space: pre-wrap;"></div>
+            </div>
+
+            <div class="print-section-unified">
+                <div class="print-section-title-unified"><i class="fas fa-lightbulb"></i> التوصيات والمقترحات التطويرية</div>
+                <div id="rpt-recommendations" style="padding: 10px; line-height: 1.8; font-size: 1.05rem; min-height: 120px; white-space: pre-wrap;"></div>
+            </div>
+
+            <!-- Event Evidence Section -->
+            <div class="print-section-unified" id="rpt-evidence-section" style="display: none;">
+                <div class="print-section-title-unified"><i class="fas fa-camera"></i> الشواهد المرئية والصور التوثيقية للفعالية</div>
+                <div id="rpt-evidence-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px;">
+                    <!-- Event evidence images will be loaded here -->
+                </div>
+            </div>
+
+
+            <!-- Footer -->
+            <div class="print-footer-unified">
+                <div>نظام إتقان - إدارة الاتصال المؤسسي</div>
+                <div class="footer-left-info">تم استخراج التقرير آلياً بتاريخ: <span id="rpt-today-footer"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Resource Modal (Room/Equipment) -->
+    <div id="resource-modal" class="modal-overlay">
+        <div class="modal-content glass-card" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 id="res-modal-title">إضافة مورد جديد</h2>
+                <button class="close-modal" onclick="closeResourceModal()">&times;</button>
+            </div>
+            <form id="resource-form" onsubmit="handleResourceSubmit(event)">
+                <input type="hidden" id="res-type">
+                <input type="hidden" id="res-id">
+                <div class="form-group">
+                    <label id="res-name-label" style="display: block; margin-bottom: 8px;">اسم المورد</label>
+                    <input type="text" id="res-name" required placeholder="أدخل المسمى هنا" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.05); color: white;">
+                </div>
+                <div id="room-fields" style="display: none; margin-top: 15px;">
+                    <div class="form-group">
+                        <label style="display: block; margin-bottom: 8px;">نوع المقر</label>
+                        <select id="res-category" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); background: #1e293b; color: white;">
+                            <option value="theater">مسرح / قاعة احتفالات</option>
+                            <option value="hall">قاعة تدريب / ورش</option>
+                            <option value="office">مكتب / غرفة اجتماعات</option>
+                            <option value="council">مجلس</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="equipment-fields" style="display: none; margin-top: 15px;">
+                    <div class="form-group">
+                        <label style="display: block; margin-bottom: 8px;">الكمية المتوفرة</label>
+                        <input type="number" id="res-quantity" value="1" min="1" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.05); color: white;">
+                    </div>
+                </div>
+                <div class="form-actions" style="margin-top: 30px; display: flex; gap: 10px;">
+                    <button type="submit" class="btn-primary" style="flex: 1;">حفظ البيانات</button>
+                    <button type="button" class="btn-secondary" onclick="closeResourceModal()" style="flex: 1;">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Room Details & Schedule Modal -->
+    <div id="room-details-modal" class="modal-overlay">
+        <div class="modal-content glass-card" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h2 id="room-detail-title">تفاصيل المقر</h2>
+                <button class="close-modal" onclick="closeRoomDetailsModal()">&times;</button>
+            </div>
+            <div class="modal-body p-4" style="color: white; padding: 20px;">
+                <div id="room-info-display" style="padding: 15px; margin-bottom: 20px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid var(--glass-border);">
+                    <!-- Info via JS -->
+                </div>
+                <h3 style="font-size: 1rem; color: var(--primary-light); margin: 20px 0 10px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-calendar-alt"></i> الحجوزات القادمة لهذا المقر
+                </h3>
+                <div id="room-schedule-list" style="max-height: 200px; overflow-y: auto; padding-right: 5px; margin-bottom: 20px;">
+                    <!-- Schedule via JS -->
+                </div>
+
+                <h3 style="font-size: 1rem; color: var(--primary-light); margin: 20px 0 10px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-camera"></i> الشواهد المرئية للمقر
+                </h3>
+                <div style="background: rgba(255,255,255,0.02); border: 1px dashed var(--glass-border); border-radius: 12px; padding: 15px; text-align: center;">
+                    <input type="file" id="room-evidence-upload" multiple accept="image/*" style="display: none;" onchange="handleRoomEvidenceUpload(event)">
+                    <button type="button" class="btn-secondary" onclick="document.getElementById('room-evidence-upload').click()" style="padding: 8px 16px; font-size: 0.85rem; border-color: var(--primary-light); color: var(--primary-light); background: transparent; cursor: pointer; border-radius: 8px;">
+                        <i class="fas fa-upload"></i> إضافة شواهد مرئية
+                    </button>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px; margin-bottom: 0;">يمكنك اختيار صورة أو أكثر لإدراجها في التقرير</p>
+                    <div id="room-evidence-thumbnails" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; justify-content: center;">
+                        <!-- Uploaded image thumbnails will be injected here -->
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; padding: 12px 15px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                    <label style="font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px; margin: 0;">
+                        <i class="fas fa-calendar-days"></i> تحديد شهر التقرير:
+                    </label>
+                    <input type="month" id="print-room-month-select" style="background: rgba(15, 23, 42, 0.6); color: white; border: 1px solid var(--glass-border); border-radius: 8px; padding: 6px 12px; outline: none; font-family: 'Readex Pro', sans-serif; font-size: 0.85rem; cursor: pointer;">
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 20px; border-top: 1px solid var(--glass-border); display: flex; gap: 10px;">
+                <button class="btn-primary" id="book-now-from-details" style="flex: 1;">حجز الآن</button>
+                <button class="btn-secondary" id="print-room-report-btn" style="flex: 1; background: rgba(59, 130, 246, 0.10); color: #60a5fa; border-color: rgba(59, 130, 246, 0.20); font-size: 0.8rem; padding: 10px 4px; white-space: nowrap;">
+                    <i class="fas fa-print"></i> التقرير الشامل
+                </button>
+                <button class="btn-secondary" id="print-room-monthly-report-btn" style="flex: 1; background: rgba(16, 185, 129, 0.10); color: #10b981; border-color: rgba(16, 185, 129, 0.20); font-size: 0.8rem; padding: 10px 4px; white-space: nowrap;">
+                    <i class="fas fa-calendar-check"></i> التقرير الشهري
+                </button>
+                <button class="btn-secondary" onclick="closeRoomDetailsModal()" style="flex: 1;">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Official Booking Request Template (Hidden Source) -->
+    <div id="booking-request-print-template" class="print-template print-theme-blue" style="display: none;">
+        <div class="print-page-unified print-theme-blue">
+            <!-- Header -->
+            <div class="print-header-unified">
+                <div class="header-right-info">
+                    المملكة العربية السعودية<br>
+                    وزارة التعليم<br>
+                    <span class="dynamic-org-name">الإدارة العامة للتعليم بمنطقة عسير</span><br>
+                    <span class="dynamic-dept-name">إدارة الاتصال المؤسسي</span>
+                </div>
+                <div class="header-center-logo-place"></div>
+                <div class="header-left-logo-container dynamic-print-logo-container">
+                    <!-- Logo injected by JS -->
+                </div>
+            </div>
+            
+            <div class="print-title-badge-container">
+                <div class="print-title-badge-unified">نموذج طلب حجز مقر / فعالية</div>
+            </div>
+
+            <!-- Section 1: Entity & Coordinator -->
+            <div class="print-section-unified">
+                <div class="print-section-title-unified">بيانات الجهة والمنسق</div>
+                <table class="print-table-unified" style="margin-top: 0;">
+                    <tr>
+                        <td style="width: 25%; font-weight: bold; background: #f8fafc;">اسم الجهة:</td>
+                        <td id="req-entity" style="width: 25%;">-</td>
+                        <td style="width: 25%; font-weight: bold; background: #f8fafc;">نوعها:</td>
+                        <td id="req-entity-type" style="width: 25%;">-</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; background: #f8fafc;">مسؤول التنسيق:</td>
+                        <td id="req-coord">-</td>
+                        <td style="font-weight: bold; background: #f8fafc;">رقم الجوال:</td>
+                        <td id="req-mobile">-</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Section 2: Timing & Venue -->
+            <div class="print-section-unified">
+                <div class="print-section-title-unified">توقيت ومقر الفعالية</div>
+                <table class="print-table-unified" style="margin-top: 0;">
+                    <tr>
+                        <td style="width: 25%; font-weight: bold; background: #f8fafc;">المقر المطلوب:</td>
+                        <td id="req-room" colspan="3">-</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 25%; font-weight: bold; background: #f8fafc;">التاريخ:</td>
+                        <td id="req-date" style="width: 25%;">-</td>
+                        <td style="width: 25%; font-weight: bold; background: #f8fafc;">الوقت / الفترة:</td>
+                        <td id="req-period" style="width: 25%;">-</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; background: #f8fafc;">مدة الفعالية:</td>
+                        <td id="req-duration">-</td>
+                        <td style="font-weight: bold; background: #f8fafc;">فئة الحضور:</td>
+                        <td id="req-audience">-</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Section 3: Event Content -->
+            <div class="print-section-unified">
+                <div class="print-section-title-unified">بيانات ومحتوى الفعالية</div>
+                <table class="print-table-unified" style="margin-top: 0;">
+                    <tr>
+                        <td style="width: 25%; font-weight: bold; background: #f8fafc;">مسمى الفعالية:</td>
+                        <td id="req-title" colspan="3">-</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 25%; font-weight: bold; background: #f8fafc;">الضيف / الراعي:</td>
+                        <td id="req-vip" style="width: 25%;">-</td>
+                        <td style="width: 25%; font-weight: bold; background: #f8fafc;">العدد المتوقع:</td>
+                        <td id="req-expected" style="width: 25%;">-</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; background: #f8fafc;">الفعاليات المصاحبة:</td>
+                        <td id="req-activities" colspan="3">-</td>
+                    </tr>
+                 </table>
+                
+                <div style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+                    <div style="font-weight: bold; color: #475569; font-size: 0.9rem;">تصنيف الفعالية:</div>
+                    <div id="req-types-list" style="display: flex; flex-wrap: wrap; gap: 10px; font-size: 0.85rem;">
+                        <!-- Via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4: Technical Needs -->
+            <div class="print-section-unified">
+                <div class="print-section-title-unified">المتطلبات التقنية واللوجستية</div>
+                <div id="req-needs-list" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 15px; border: 1.5px dashed #cbd5e1; border-radius: 8px; background: #f8fafc;">
+                    <!-- Via JS -->
+                </div>
+            </div>
+
+            <!-- Undertaking Box -->
+            <div style="background: #f8fafc; border-right: 5px solid #3b82f6; padding: 15px; border-radius: 8px; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; border-left: 1px solid #e2e8f0; margin-bottom: 20px;">
+                <h4 style="margin: 0 0 8px 0; color: #1e40af; font-size: 0.95rem; font-weight: 800;"><i class="fas fa-handshake"></i> تعهد الجهة الطالبة</h4>
+                <ol style="margin: 0; padding-right: 20px; font-size: 0.8rem; line-height: 1.6; color: #334155;">
+                    <li>نتعهد بالمحافظة التامة على نظافة المسرح وجميع مرافقه.</li>
+                    <li>نتعهد بعدم إتلاف أي من الأثاث أو التجهيزات أو الممتلكات الموجودة فيه، وفي حال حدوث أي تلفيات نتحمل كامل المسؤولية عن إصلاحها أو تعويضها.</li>
+                    <li>نتعهد بعدم جمع أو استلام أي مبالغ مالية من الحضور مقابل الدخول إلى المسرح أو المشاركة في الفعالية ونتحمل كامل المسؤولية النظامية في حال مخالفة ذلك.</li>
+                    <li>يُمنع إدخال المأكولات والمشروبات إلى المسرح.</li>
+                </ol>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 15px; margin-bottom: 20px; font-size: 0.8rem;">
+                <div style="padding: 10px 15px; border: 1px dashed #cbd5e1; border-radius: 8px; background: #f8fafc;">
+                    <h4 style="margin: 0 0 5px 0; font-size: 0.85rem; color: #475569;"><i class="fas fa-info-circle"></i> التعليمات</h4>
+                    <ul style="margin: 0; padding-right: 15px; line-height: 1.5; color: #64748b;">
+                        <li>تعبئة النموذج قبل تاريخ الفعالية بعشرة أيام على الأقل.</li>
+                        <li>إبلاغ المنسق قبل الموعد بيومين في حال الإلغاء أو التأجيل.</li>
+                    </ul>
+                </div>
+                <div style="padding: 10px 15px; border: 1px solid #fee2e2; border-radius: 8px; background: #fff5f5; color: #b91c1c; display: flex; align-items: center; justify-content: center; font-weight: bold; text-align: center;">
+                    <i class="fas fa-exclamation-triangle" style="margin-left: 8px; font-size: 1.1rem;"></i> لا يتحمل المسرح أي مسؤولية حيال فقدان أو تلف الممتلكات الشخصية أو العينية داخل مرافقه.
+                </div>
+            </div>
+
+            <!-- Stamp Row -->
+            <div id="print-dept-approval-row" class="print-stamp-panel-unified">
+                <div class="print-stamp-box-unified">
+                    <h4>تم اعتماد الحجز من إدارة الاتصال المؤسسي</h4>
+                    <div class="print-stamp-image-container">
+                        <img id="req-stamp-img" src="" style="display: none;">
+                        <span id="stamp-placeholder" class="print-stamp-placeholder">ختم الاعتماد الرقمي</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="print-footer-unified">
+                <div>نظام إتقان - إدارة الاتصال المؤسسي</div>
+                <div>طبع في تاريخ: <span id="req-print-date"></span></div>
+            </div>
+            
+            <!-- Contact bar -->
+            <div class="print-contact-bar-unified">
+                <i class="fas fa-phone-alt"></i> للتنسيق والاستفسار التواصل / <span class="dynamic-contact-number"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- All Bookings List Template (Hidden Source) -->
+    <div id="all-bookings-print-template" class="print-template print-theme-blue" style="display: none;">
+        <div class="print-page-unified print-theme-blue" style="width: 297mm; min-height: 210mm; padding: 15mm;">
+            <!-- Header -->
+            <div class="print-header-unified">
+                <div class="header-right-info">
+                    المملكة العربية السعودية<br>
+                    وزارة التعليم<br>
+                    <span class="dynamic-org-name">الإدارة العامة للتعليم بمنطقة عسير</span><br>
+                    <span class="dynamic-dept-name">إدارة الاتصال المؤسسي</span>
+                </div>
+                <div class="header-center-logo-place"></div>
+                <div class="header-left-logo-container dynamic-print-logo-container">
+                    <!-- Logo injected by JS -->
+                </div>
+            </div>
+
+            <div class="print-title-badge-container">
+                <div id="all-bookings-print-title" class="print-title-badge-unified">تقرير بكافة الحجوزات والفعاليات المسجلة</div>
+            </div>
+
+            <table class="print-table-unified">
+                <thead>
+                    <tr>
+                        <th style="padding: 12px; border: 1px solid #ddd; text-align: right;">التاريخ</th>
+                        <th style="padding: 12px; border: 1px solid #ddd; text-align: right;">الوقت</th>
+                        <th style="padding: 12px; border: 1px solid #ddd; text-align: right;">الفعالية</th>
+                        <th style="padding: 12px; border: 1px solid #ddd; text-align: right;">المقر / القاعة</th>
+                        <th style="padding: 12px; border: 1px solid #ddd; text-align: right;">الجهة المنظمة</th>
+                    </tr>
+                </thead>
+                <tbody id="all-bookings-table-body">
+                    <!-- Via JS -->
+                </tbody>
+            </table>
+
+            <!-- Footer -->
+            <div class="print-footer-unified">
+                <div>إجمالي عدد الفعاليات: <span id="all-bookings-count">0</span></div>
+                <div class="footer-left-info">تاريخ استخراج التقرير: <span id="all-bookings-gen-date"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blacklist Print Template -->
+    <div id="blacklist-print-template" class="print-template print-theme-red" style="display: none;">
+        <div class="print-page-unified print-theme-red" style="width: 297mm; min-height: 210mm; padding: 15mm;">
+            <!-- Header -->
+            <div class="print-header-unified">
+                <div class="header-right-info">
+                    المملكة العربية السعودية<br>
+                    وزارة التعليم<br>
+                    <span class="dynamic-org-name">الإدارة العامة للتعليم بمنطقة عسير</span><br>
+                    <span class="dynamic-dept-name">إدارة الاتصال المؤسسي</span>
+                </div>
+                <div class="header-center-logo-place"></div>
+                <div class="header-left-logo-container dynamic-print-logo-container">
+                    <!-- Logo injected by JS -->
+                </div>
+            </div>
+
+            <div class="print-title-badge-container">
+                <div class="print-title-badge-unified">تقرير القائمة السوداء للجهات والمنسقين المحظورين</div>
+            </div>
+
+            <table class="print-table-unified">
+                <thead>
+                    <tr>
+                        <th style="padding: 12px; border: 1px solid #ddd; text-align: right;">النوع</th>
+                        <th style="padding: 12px; border: 1px solid #ddd; text-align: right;">الاسم / الكيان بالكامل</th>
+                        <th style="padding: 12px; border: 1px solid #ddd; text-align: right;">سبب الحظر والمنع بالتفصيل</th>
+                        <th style="padding: 12px; border: 1px solid #ddd; text-align: right;">تاريخ الإدراج بالحظر</th>
+                    </tr>
+                </thead>
+                <tbody id="blacklist-print-table-body">
+                    <!-- Via JS -->
+                </tbody>
+            </table>
+
+            <!-- Footer -->
+            <div class="print-footer-unified">
+                <div>إجمالي عدد المحظورين: <span id="blacklist-print-count">0</span> كيان</div>
+                <div class="footer-left-info">تاريخ استخراج التقرير: <span id="blacklist-print-gen-date"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Print Template (Visual Grid) -->
+    <div id="calendar-print-template" class="print-template print-theme-blue" style="display: none;">
+        <div class="print-page-unified print-theme-blue" style="width: 297mm; min-height: 210mm; padding: 15mm;">
+            <!-- Header -->
+            <div class="print-header-unified">
+                <div class="header-right-info">
+                    المملكة العربية السعودية<br>
+                    وزارة التعليم<br>
+                    <span class="dynamic-org-name">الإدارة العامة للتعليم بمنطقة عسير</span><br>
+                    <span class="dynamic-dept-name">إدارة الاتصال المؤسسي</span>
+                </div>
+                <div class="header-center-logo-place"></div>
+                <div class="header-left-logo-container dynamic-print-logo-container">
+                    <!-- Logo injected by JS -->
+                </div>
+            </div>
+
+            <div class="print-title-badge-container">
+                <div id="cal-print-title" class="print-title-badge-unified"></div>
+            </div>
+            
+            <div id="cal-print-grid-container" style="border: 2.5px solid #cbd5e1; border-radius: 12px; overflow: hidden; background: white;">
+                <!-- The calendar grid rows will be injected here -->
+            </div>
+
+            <!-- Footer -->
+            <div class="print-footer-unified">
+                <div>نظام إتقان - إدارة الاتصال المؤسسي</div>
+                <div class="footer-left-info">طبع في <span id="rpt-print-date"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Notification Letter Template (Hidden Source) - Unified Modern Design -->
+    <div id="event-notification-print-template" class="print-template print-theme-blue" style="display: none;">
+        <div class="print-page-unified print-theme-blue">
+            <!-- Header -->
+            <div class="print-header-unified">
+                <div class="header-right-info">
+                    المملكة العربية السعودية<br>
+                    وزارة التعليم<br>
+                    <span class="dynamic-org-name">الإدارة العامة للتعليم بمنطقة عسير</span><br>
+                    <span class="dynamic-dept-name">إدارة الاتصال المؤسسي</span>
+                </div>
+                <div class="header-center-logo-place"></div>
+                <div class="header-left-logo-container dynamic-print-logo-container">
+                    <!-- Logo injected by JS -->
+                </div>
+            </div>
+
+            <!-- Title -->
+            <div class="print-title-badge-container">
+                <div class="print-title-badge-unified">إشعار موعد فعالية</div>
+            </div>
+
+            <!-- Salutation & Opening -->
+            <div class="print-letter-text-unified" style="margin-bottom: 20px;">
+                <p class="salutation">المكرم / <span id="notif-entity-name" style="font-weight: 800;"></span> المحترم</p>
+                <p>السلام عليكم ورحمة الله وبركاته،، وبعد:</p>
+                <p>تود الاتصال المؤسسي إفادتكم باعتماد موعد إقامة الفعالية المقترحة من قبلكم، وفيما يلي تفاصيل الموعد والمقر المحجوز:</p>
+            </div>
+
+            <!-- Details Box -->
+            <div class="print-info-box-unified" style="margin-bottom: 25px;">
+                <table class="print-info-table-unified">
+                    <tr>
+                        <td class="label">مسمى الفعالية:</td>
+                        <td id="notif-event-title" class="value"></td>
+                    </tr>
+                    <tr>
+                        <td class="label">المقـر المحجوز:</td>
+                        <td id="notif-room-name" class="value"></td>
+                    </tr>
+                    <tr>
+                        <td class="label">تاريخ التنفيذ:</td>
+                        <td class="value"><span id="notif-date-g"></span> م (<span id="notif-date-h"></span> هـ )</td>
+                    </tr>
+                    <tr>
+                        <td class="label">وقت البدء:</td>
+                        <td class="value"><span id="notif-time"></span> <span id="notif-period"></span></td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Closing -->
+            <div class="print-letter-text-unified" style="margin-bottom: 40px; text-align: center;">
+                <p style="text-align: right;">نأمل التكرم بالالتزام بالموعد المحدد والتواصل مع منسق الموقع قبل الموعد بـ 24 ساعة لتأكيد الترتيبات النهائية.</p>
+                <p style="font-weight: 800; font-size: 1.2rem; margin-top: 25px;">وتقبلوا خالص التحية والتقدير،،</p>
+            </div>
+
+            <!-- Signature/Footer -->
+            <div style="margin-top: auto; text-align: center; border-top: 1px solid #edf2f7; padding-top: 15px; width: 100%;">
+                <p style="font-weight: 800; font-size: 1.15rem; color: #1e293b; margin-bottom: 3px;">إدارة الاتصال المؤسسي</p>
+                <p style="font-size: 0.85rem; color: #64748b;">(هذا الإشعار مستخرج آلياً من نظام إتقان ولا يتطلب توقيعاً)</p>
+            </div>
+
+            <!-- Contact bar -->
+            <div class="print-contact-bar-unified">
+                <i class="fas fa-phone-alt"></i> للتنسيق والاستفسار التواصل / <span class="dynamic-contact-number"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Cancellation Letter Template (Hidden Source) - Unified Modern Design -->
+    <div id="event-cancellation-print-template" class="print-template print-theme-blue" style="display: none;">
+        <div class="print-page-unified print-theme-blue">
+            <!-- Header -->
+            <div class="print-header-unified">
+                <div class="header-right-info">
+                    المملكة العربية السعودية<br>
+                    وزارة التعليم<br>
+                    <span class="dynamic-org-name">الإدارة العامة للتعليم بمنطقة عسير</span><br>
+                    <span class="dynamic-dept-name">إدارة الاتصال المؤسسي</span>
+                </div>
+                <div class="header-center-logo-place"></div>
+                <div class="header-left-logo-container dynamic-print-logo-container">
+                    <!-- Logo injected by JS -->
+                </div>
+            </div>
+
+            <!-- Title -->
+            <div class="print-title-badge-container">
+                <div class="print-title-badge-unified">إشعار إلغاء/اعتذار عن حجز مقر</div>
+            </div>
+
+            <!-- Salutation & Opening -->
+            <div class="print-letter-text-unified" style="margin-bottom: 20px;">
+                <p class="salutation">المكرم / <span id="cancel-entity-name" style="font-weight: 800;"></span> المحترم</p>
+                <p>السلام عليكم ورحمة الله وبركاته،، وبعد:</p>
+                <p>نظراً لظروف طارئة أو بناءً على تحديثات خطة تشغيل المقرات، نود إفادتكم بالاعتذار عن عدم إمكانية إقامة الفعالية المقترحة من قبلكم، وإلغاء الحجز المرتبط بها حسب التفاصيل التالية:</p>
+            </div>
+
+            <!-- Details Box -->
+            <div class="print-info-box-unified" style="margin-bottom: 25px;">
+                <table class="print-info-table-unified">
+                    <tr>
+                        <td class="label">مسمى الفعالية:</td>
+                        <td id="cancel-event-title" class="value" style="color: var(--print-theme-color);"></td>
+                    </tr>
+                    <tr>
+                        <td class="label">المقـر الملغى:</td>
+                        <td id="cancel-room-name" class="value"></td>
+                    </tr>
+                    <tr>
+                        <td class="label">تاريخ الفعالية:</td>
+                        <td class="value"><span id="cancel-date-g"></span> م (<span id="cancel-date-h"></span> هـ )</td>
+                    </tr>
+                    <tr>
+                        <td class="label">وقت البدء:</td>
+                        <td class="value"><span id="cancel-time"></span> <span id="cancel-period"></span></td>
+                    </tr>
+                    <tr id="cancel-reason-row">
+                        <td class="label" style="color: #b91c1c;">سبب إلغاء الحجز:</td>
+                        <td id="cancel-reason" class="value" style="color: #b91c1c; font-weight: bold;">-</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Closing -->
+            <div class="print-letter-text-unified" style="margin-bottom: 40px; text-align: center;">
+                <p style="text-align: right;">شاكرين لكم تفهمكم وتعاونكم الدائم، ونسعد باستقبال طلباتكم الأخرى في أوقات لاحقة.</p>
+                <p style="font-weight: 800; font-size: 1.2rem; margin-top: 25px;">وتقبلوا خالص التحية والتقدير،،</p>
+            </div>
+
+            <!-- Signature/Footer -->
+            <div style="margin-top: auto; text-align: center; border-top: 1px solid #edf2f7; padding-top: 15px; width: 100%;">
+                <p style="font-weight: 800; font-size: 1.15rem; color: #1e293b; margin-bottom: 3px;">إدارة الاتصال المؤسسي</p>
+                <p style="font-size: 0.85rem; color: #64748b;">(هذا الإشعار مستخرج آلياً من نظام إتقان ولا يتطلب توقيعاً)</p>
+            </div>
+
+            <!-- Contact bar -->
+            <div class="print-contact-bar-unified">
+                <i class="fas fa-phone-alt"></i> للتنسيق والاستفسار التواصل / <span class="dynamic-contact-number"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Details View Modal -->
+    <div id="booking-details-modal" class="modal-overlay">
+        <div class="modal-content glass-card" style="max-width: 500px; border: 1px solid var(--secondary); box-shadow: var(--neon-purple);">
+            <div class="modal-header" style="border-bottom: 1px solid var(--glass-border); padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="color: var(--secondary); text-shadow: var(--neon-purple); display: flex; align-items: center; gap: 10px; margin: 0;">
+                    <i class="fas fa-info-circle"></i> تفاصيل الحجز
+                </h2>
+                <button class="close-modal" onclick="closeDetailsModal()" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+            <div id="booking-details-body" style="display: flex; flex-direction: column; gap: 20px;">
+                <!-- Content injected by JS -->
+            </div>
+            <div style="margin-top: 30px; display: flex; gap: 15px;">
+                <button class="btn-primary" style="flex: 1;" onclick="closeDetailsModal()">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Premium In-App Print Preview Modal -->
+    <div id="report-preview-modal" class="modal-overlay">
+        <div class="modal-content glass-card" style="max-width: 900px; width: 95%; background: rgba(15, 23, 42, 0.95);">
+            <div class="modal-header">
+                <h2>معاينة التقرير النهائي</h2>
+                <button class="close-modal" onclick="closeReportPreview()">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 20px; overflow-y: auto; max-height: 70vh; display: flex; justify-content: center; background: rgba(0,0,0,0.2);">
+                <div id="paper-preview-container" style="background: transparent; color: black; width: 210mm; height: auto; padding: 20px 0; transform-origin: top center; display: flex; flex-direction: column; gap: 40px; align-items: center;">
+                    <!-- Content via JS -->
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top: 20px; display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
+                <button class="btn-secondary" onclick="closeReportPreview()">إغلاق</button>
+                <button class="btn-secondary" onclick="exportToWord()" style="background: rgba(43, 87, 151, 0.2); color: #2b5797; border-color: rgba(43, 87, 151, 0.3);">
+                    <i class="fas fa-file-word"></i> تصدير كـ Word
+                </button>
+                <button class="btn-secondary" onclick="shareToWhatsApp()" style="background: rgba(37, 211, 102, 0.2); color: #25D366; border-color: rgba(37, 211, 102, 0.3);">
+                    <i class="fab fa-whatsapp"></i> إرسال واتساب
+                </button>
+                <button class="btn-secondary" onclick="confirmFinalPrint()" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border-color: rgba(239, 68, 68, 0.3);">
+                    <i class="fas fa-file-pdf"></i> تصدير كـ PDF
+                </button>
+                <button class="btn-primary" onclick="confirmFinalPrint()">
+                    <i class="fas fa-print"></i> تنفيذ الطباعة الآن
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="blacklist-modal" class="modal-overlay">
+        <div class="modal-content glass-card" style="max-width: 500px; width: 95%; border: 1px solid rgba(239,68,68,0.3); box-shadow: 0 4px 25px rgba(239, 68, 68, 0.25); background: rgba(15, 23, 42, 0.95); font-family: 'Readex Pro', sans-serif; overflow: visible !important;">
+            <div class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 15px;">
+                <h2 style="color: #ef4444; display: flex; align-items: center; gap: 10px; margin: 0; font-size: 1.3rem;"><i class="fas fa-ban"></i> إضافة في القائمة السوداء</h2>
+                <button class="close-modal" onclick="window.closeBlacklistModal()" style="font-size: 1.5rem; background: transparent; border: none; color: white; cursor: pointer;">&times;</button>
+            </div>
+            <form id="blacklist-form" onsubmit="window.handleBlacklistSubmit(event)" style="padding-top: 20px;">
+                <div class="form-group" style="margin-bottom: 18px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; color: var(--primary-light);">نوع الحظر</label>
+                    <select id="blacklist-type" required onchange="window.handleBlacklistTypeChange(this.value)" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: #1e293b; color: white; outline: none; font-family: 'Readex Pro', sans-serif; font-size: 0.85rem; box-sizing: border-box;">
+                        <option value="entity">حظر جهة كاملة (مثال: مكتب التدريب، إدارة النشاط)</option>
+                        <option value="coordinator">حظر منسق محدد (بناءً على اسم المنسق أو جواله)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 18px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; color: var(--primary-light);">الاسم / الكيان بالكامل</label>
+                    <input type="text" id="blacklist-value" required placeholder="أدخل الاسم أو الكيان المستهدف بالحظر بدقة..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.25); color: white; outline: none; font-family: 'Readex Pro', sans-serif; font-size: 0.85rem; box-sizing: border-box;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; color: var(--primary-light);">سبب الحظر والمنع (يمكن اختيار أكثر من بند)</label>
+                    <div class="custom-multi-select" style="position: relative; width: 100%; margin-bottom: 10px;">
+                        <div id="blacklist-reason-header" onclick="window.toggleBlacklistReasonDropdown(event)" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: #1e293b; color: white; cursor: pointer; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; font-family: 'Readex Pro', sans-serif; font-size: 0.85rem; transition: border-color 0.3s, box-shadow 0.3s;" onmouseover="this.style.borderColor='var(--primary-light)'; this.style.boxShadow='0 0 10px rgba(0, 210, 255, 0.15)';" onmouseout="this.style.borderColor='var(--glass-border)'; this.style.boxShadow='none';">
+                            <span id="selected-blacklist-reasons-text" style="color: #cbd5e1;">اضغط لاختيار بند أو أكثر من بنود المخالفة...</span>
+                            <i class="fas fa-chevron-down" style="color: var(--primary-light); font-size: 0.8rem; transition: transform 0.3s;"></i>
+                        </div>
+                        <div id="blacklist-reason-dropdown" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: #1e293b; border: 1px solid var(--glass-border); border-radius: 8px; margin-top: 5px; z-index: 1000; max-height: 250px; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.5); box-sizing: border-box;">
+                            <div class="multi-select-item" onclick="window.toggleBlacklistReasonSelection('band1', event)" style="display: flex; align-items: center; gap: 12px; padding: 12px 15px; cursor: pointer; transition: background 0.2s; border-bottom: 1px solid rgba(255,255,255,0.05);" onmouseover="this.style.background='rgba(0, 210, 255, 0.05)';" onmouseout="this.style.background='transparent';">
+                                <input type="checkbox" id="reason-band1" name="blacklist-reasons-checkboxes" value="عدم الالتزام بالمحافظة التامة على نظافة المسرح ومرافقه (مخالفة البند الأول للتعهد)." onclick="event.stopPropagation(); window.updateSelectedBlacklistReasonsText();" style="width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; flex-shrink: 0;">
+                                <span style="color: white; font-size: 0.85rem; font-family: 'Readex Pro', sans-serif; line-height: 1.4;">عدم المحافظة على نظافة المسرح ومرافقه (البند 1)</span>
+                            </div>
+                            <div class="multi-select-item" onclick="window.toggleBlacklistReasonSelection('band2', event)" style="display: flex; align-items: center; gap: 12px; padding: 12px 15px; cursor: pointer; transition: background 0.2s; border-bottom: 1px solid rgba(255,255,255,0.05);" onmouseover="this.style.background='rgba(0, 210, 255, 0.05)';" onmouseout="this.style.background='transparent';">
+                                <input type="checkbox" id="reason-band2" name="blacklist-reasons-checkboxes" value="إتلاف أو تضرر بعض الأثاث أو التجهيزات أو الممتلكات الموجودة بالمسرح والتهرب من إصلاحها (مخالفة البند الثاني للتعهد)." onclick="event.stopPropagation(); window.updateSelectedBlacklistReasonsText();" style="width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; flex-shrink: 0;">
+                                <span style="color: white; font-size: 0.85rem; font-family: 'Readex Pro', sans-serif; line-height: 1.4;">إتلاف أو تضرر الأثاث والتجهيزات بالمقر (البند 2)</span>
+                            </div>
+                            <div class="multi-select-item" onclick="window.toggleBlacklistReasonSelection('band3', event)" style="display: flex; align-items: center; gap: 12px; padding: 12px 15px; cursor: pointer; transition: background 0.2s; border-bottom: 1px solid rgba(255,255,255,0.05);" onmouseover="this.style.background='rgba(0, 210, 255, 0.05)';" onmouseout="this.style.background='transparent';">
+                                <input type="checkbox" id="reason-band3" name="blacklist-reasons-checkboxes" value="جمع أو استلام مبالغ مالية من الحضور مقابل الدخول إلى المسرح أو المشاركة في الفعالية بشكل غير نظامي (مخالفة البند الثالث للتعهد)." onclick="event.stopPropagation(); window.updateSelectedBlacklistReasonsText();" style="width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; flex-shrink: 0;">
+                                <span style="color: white; font-size: 0.85rem; font-family: 'Readex Pro', sans-serif; line-height: 1.4;">جمع أو استلام مبالغ مالية من الحضور (البند 3)</span>
+                            </div>
+                            <div class="multi-select-item" onclick="window.toggleBlacklistReasonSelection('band4', event)" style="display: flex; align-items: center; gap: 12px; padding: 12px 15px; cursor: pointer; transition: background 0.2s; border-bottom: 1px solid rgba(255,255,255,0.05);" onmouseover="this.style.background='rgba(0, 210, 255, 0.05)';" onmouseout="this.style.background='transparent';">
+                                <input type="checkbox" id="reason-band4" name="blacklist-reasons-checkboxes" value="إدخال المأكولات والمشروبات إلى داخل قاعة المسرح ومخالفة التعليمات الصريحة (مخالفة البند الرابع للتعهد)." onclick="event.stopPropagation(); window.updateSelectedBlacklistReasonsText();" style="width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; flex-shrink: 0;">
+                                <span style="color: white; font-size: 0.85rem; font-family: 'Readex Pro', sans-serif; line-height: 1.4;">إدخال المأكولات والمشروبات للمقر (البند 4)</span>
+                            </div>
+                            <div class="multi-select-item" onclick="window.toggleBlacklistReasonSelection('custom', event)" style="display: flex; align-items: center; gap: 12px; padding: 12px 15px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='rgba(0, 210, 255, 0.05)';" onmouseout="this.style.background='transparent';">
+                                <input type="checkbox" id="reason-custom" name="blacklist-reasons-checkboxes" value="custom" onclick="event.stopPropagation(); window.updateSelectedBlacklistReasonsText();" style="width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; flex-shrink: 0;">
+                                <span style="color: white; font-size: 0.85rem; font-family: 'Readex Pro', sans-serif; line-height: 1.4;">أخرى (كتابة سبب مخصص...)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <textarea id="blacklist-reason" placeholder="يرجى كتابة أسباب الحظر بالتفصيل لتوثيق الإجراء ورصده تلقائياً..." rows="4" style="display: none; width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.25); color: white; outline: none; resize: none; font-family: 'Readex Pro', sans-serif; font-size: 0.85rem; line-height: 1.6; box-sizing: border-box;"></textarea>
+                </div>
+
+                <div class="form-actions" style="margin-top: 25px; display: flex; gap: 12px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px;">
+                    <button type="submit" class="btn-primary" style="flex: 1.3; background: linear-gradient(135deg, #ef4444, #b91c1c); border-color: #ef4444; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25); padding: 12px; font-weight: 700; border-radius: 8px; cursor: pointer; color: white;">حظر الكيان وتفعيله</button>
+                    <button type="button" class="btn-secondary" onclick="window.closeBlacklistModal()" style="flex: 1; padding: 12px; border-radius: 8px; cursor: pointer;">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Blacklist Details View Modal -->
+    <div id="blacklist-details-modal" class="modal-overlay">
+        <div class="modal-content glass-card" style="max-width: 550px; width: 95%; border: 1px solid rgba(239,68,68,0.3); box-shadow: 0 4px 25px rgba(239, 68, 68, 0.25); background: rgba(15, 23, 42, 0.95); font-family: 'Readex Pro', sans-serif;">
+            <div class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="color: #ef4444; display: flex; align-items: center; gap: 10px; margin: 0; font-size: 1.3rem;"><i class="fas fa-user-shield"></i> تفاصيل الحظر والمنع</h2>
+                <button class="close-modal" onclick="window.closeBlacklistDetailsModal()" style="font-size: 1.5rem; background: transparent; border: none; color: white; cursor: pointer;">&times;</button>
+            </div>
+            <div style="padding: 20px 0; display: flex; flex-direction: column; gap: 15px;">
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px;">
+                    <span style="font-size: 0.9rem; color: var(--text-muted);">نوع الكيان المحظور:</span>
+                    <div id="blacklist-details-type"></div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 6px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px;">
+                    <span style="font-size: 0.9rem; color: var(--text-muted);">الاسم / الكيان بالكامل:</span>
+                    <span id="blacklist-details-value" style="font-size: 1.15rem; font-weight: 700; color: white;"></span>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px;">
+                    <span style="font-size: 0.9rem; color: var(--text-muted);">سبب الحظر والمنع بالتفصيل:</span>
+                    <p id="blacklist-details-reason" style="font-size: 0.9rem; color: #cbd5e1; line-height: 1.6; margin: 0; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); white-space: normal;"></p>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.9rem; color: var(--text-muted);">تاريخ الإدراج بالحظر:</span>
+                    <span id="blacklist-details-date" style="font-size: 0.9rem; color: white; font-weight: 600;"></span>
+                </div>
+            </div>
+
+            <div style="margin-top: 25px; display: flex; gap: 12px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px; flex-wrap: wrap;">
+                <button onclick="window.printSingleBlacklist()" style="flex: 1.3; display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, #ef4444, #b91c1c); border: 1px solid #ef4444; color: white; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem;">
+                    <i class="fas fa-print"></i> طباعة قرار الحظر
+                </button>
+                <button onclick="window.deleteCurrentBlacklistItem()" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239,68,68,0.2); color: #ef4444; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.85rem;">
+                    <i class="fas fa-trash-can"></i> إزالة
+                </button>
+                <button onclick="window.closeBlacklistDetailsModal()" style="flex: 0.8; background: #334155; border: 1px solid #475569; color: white; padding: 12px; border-radius: 8px; cursor: pointer; font-size: 0.85rem;">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Single Ban Print Template - Unified Modern Design -->
+    <div id="single-ban-print-template" class="print-template print-theme-red" style="display: none;">
+        <div class="print-page-unified print-theme-red">
+            <!-- Header -->
+            <div class="print-header-unified">
+                <div class="header-right-info">
+                    المملكة العربية السعودية<br>
+                    وزارة التعليم<br>
+                    <span class="dynamic-org-name">الإدارة العامة للتعليم بمنطقة عسير</span><br>
+                    <span class="dynamic-dept-name">إدارة الاتصال المؤسسي</span>
+                </div>
+                <div class="header-center-logo-place"></div>
+                <div class="header-left-logo-container dynamic-print-logo-container">
+                    <!-- Logo injected by JS -->
+                </div>
+            </div>
+
+            <!-- Title -->
+            <div class="print-title-badge-container">
+                <div class="print-title-badge-unified">قرار إدراج جهة/منسق في القائمة السوداء للمقرات</div>
+                <div style="font-size: 0.95rem; color: #64748b; margin-top: 8px; font-weight: bold;">رقم القرار: ق س / <span id="ban-print-id"></span></div>
+            </div>
+
+            <!-- Opening Text -->
+            <div class="print-letter-text-unified" style="margin-bottom: 20px; font-size: 1.05rem;">
+                بناءً على التعهدات والتعليمات المنظمة لتشغيل واستخدام مسرح وقاعات الإدارة العامة، وبناءً على التجاوزات التي تم رصدها وتوثيقها ميدانياً، فقد تقرر رسمياً إدراج الكيان التالي في القائمة السوداء للجهات والمنسقين وحظر جميع حجوزاتهم المستقبلية تلقائياً بمحرك النظام حتى إشعار آخر:
+            </div>
+
+            <!-- Details Table -->
+            <div class="print-info-box-unified" style="margin-bottom: 25px;">
+                <table class="print-info-table-unified">
+                    <tr>
+                        <td class="label">نوع الكيان المحظور:</td>
+                        <td id="ban-print-type" class="value"></td>
+                    </tr>
+                    <tr>
+                        <td class="label" style="color: #b91c1c;">الاسم / الكيان بالكامل:</td>
+                        <td id="ban-print-value" class="value" style="color: #b91c1c; font-size: 1.15rem; font-weight: 800;"></td>
+                    </tr>
+                    <tr>
+                        <td class="label">تاريخ سريان الحظر:</td>
+                        <td id="ban-print-date" class="value"></td>
+                    </tr>
+                    <tr>
+                        <td class="label" style="vertical-align: top; padding-top: 12px;">أسباب ومبررات الحظر:</td>
+                        <td id="ban-print-reason" class="value" style="line-height: 1.6; font-weight: 500; font-size: 0.95rem; white-space: pre-wrap; padding-top: 12px;"></td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Directive Text -->
+            <div class="print-letter-text-unified" style="margin-bottom: 40px; font-size: 1.05rem;">
+                وعليه، يمنع منعاً باتاً تمكين الجهة المذكورة أو منسقها من القيام بأي نشاط أو فعالية أو حجز أي مقر من المقرات التابعة للإدارة، وتتحمل الجهة المسؤولية الكاملة عن أي تجاوز للتعليمات.
+            </div>
+
+            <!-- Footer -->
+            <div class="print-footer-unified" style="margin-top: auto;">
+                <div>نظام إتقان لإدارة المقرات - قرار حظر رسمي</div>
+                <div class="footer-left-info">تاريخ استخراج الوثيقة: <span id="ban-print-gen-date"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Room Report Print Template (Hidden) - Unified Modern Design -->
+    <div id="room-report-print-template" class="print-template print-theme-blue" style="display: none;">
+        <div class="print-page-unified print-theme-blue">
+            <!-- Header -->
+            <div class="print-header-unified">
+                <div class="header-right-info">
+                    المملكة العربية السعودية<br>
+                    وزارة التعليم<br>
+                    <span class="dynamic-org-name">الإدارة العامة للتعليم</span><br>
+                    <span class="dynamic-dept-name">إدارة الاتصال المؤسسي</span>
+                </div>
+                <div class="header-center-logo-place"></div>
+                <div class="header-left-logo-container dynamic-print-logo-container">
+                    <!-- Logo via JS -->
+                </div>
+            </div>
+
+            <!-- Report Title -->
+            <div class="print-title-badge-container">
+                <div class="print-title-badge-unified" id="room-rpt-title-badge">تقرير المقر والحجوزات</div>
+            </div>
+
+            <!-- Room General Info -->
+            <div class="print-info-box-unified">
+                <table class="print-info-table-unified">
+                    <tr>
+                        <td class="label" style="width: 25%;">اسم المقر:</td>
+                        <td id="room-rpt-name" class="value" style="width: 25%; font-weight: bold;"></td>
+                        <td class="label" style="width: 25%;">تصنيف المقر:</td>
+                        <td id="room-rpt-category" class="value" style="width: 25%;"></td>
+                    </tr>
+                    <tr>
+                        <td class="label">تاريخ استخراج التقرير:</td>
+                        <td id="room-rpt-date" class="value"></td>
+                        <td class="label">مستخرج التقرير:</td>
+                        <td class="value">نظام إتقان الإلكتروني</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Bookings List Table -->
+            <div class="print-section-unified">
+                <div class="print-section-title-unified" id="room-rpt-table-title"><i class="fas fa-calendar-alt"></i> جدول الفعاليات والحجوزات القادمة</div>
+                <table class="print-table-unified" style="margin-top: 10px;">
+                    <thead>
+                        <tr>
+                            <th style="width: 20%; padding: 8px; text-align: right; background: #e2e8f0; color: #1e293b; border: 1px solid #cbd5e1;">التاريخ</th>
+                            <th style="width: 15%; padding: 8px; text-align: right; background: #e2e8f0; color: #1e293b; border: 1px solid #cbd5e1;">الفترة</th>
+                            <th style="width: 35%; padding: 8px; text-align: right; background: #e2e8f0; color: #1e293b; border: 1px solid #cbd5e1;">الفعالية</th>
+                            <th style="width: 30%; padding: 8px; text-align: right; background: #e2e8f0; color: #1e293b; border: 1px solid #cbd5e1;">الجهة المنظمة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="room-rpt-bookings-table-body">
+                        <!-- Bookings will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Evidence Section -->
+            <div class="print-section-unified" id="room-rpt-evidence-section" style="display: none;">
+                <div class="print-section-title-unified"><i class="fas fa-camera"></i> الشواهد المرئية والصور التوثيقية</div>
+                <div id="room-rpt-evidence-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px;">
+                    <!-- Evidence images will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="print-footer-unified" style="margin-top: auto; padding-top: 20px;">
+                <div>نظام إتقان - إدارة الاتصال المؤسسي</div>
+                <div class="footer-left-info">تم استخراج التقرير آلياً بواسطة نظام إتقان</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" style="position: fixed; bottom: 30px; left: 30px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;"></div>
+
+    <!-- Custom Prompt Modal for Cancellation Reason -->
+    <div id="custom-prompt-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 99999; align-items: center; justify-content: center; backdrop-filter: blur(6px);">
+        <div style="background: #1e293b; border: 1px solid rgba(239,68,68,0.4); border-radius: 18px; padding: 32px; max-width: 480px; width: 90%; box-shadow: 0 25px 60px rgba(0,0,0,0.5); animation: slideInRight 0.3s ease;">
+            <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 20px;">
+                <div style="width: 44px; height: 44px; background: rgba(239,68,68,0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(239,68,68,0.3);">
+                    <i class="fas fa-times-circle" style="color: #ef4444; font-size: 1.2rem;"></i>
+                </div>
+                <div>
+                    <h3 style="margin: 0; font-size: 1.1rem; color: #f1f5f9;">إلغاء الحجز</h3>
+                    <p style="margin: 0; font-size: 0.8rem; color: #94a3b8;">يرجى إدخال سبب الإلغاء</p>
+                </div>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 8px; display: block;">سبب إلغاء الحجز <span style="color: #64748b;">(اختياري)</span></label>
+                <textarea id="custom-prompt-input" rows="3" placeholder="مثال: تأجيل الفعالية بطلب من الجهة المنظمة..." style="width: 100%; background: rgba(255,255,255,0.05); color: #f1f5f9; border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 12px 15px; font-size: 0.9rem; resize: none; outline: none; font-family: 'Readex Pro', sans-serif; line-height: 1.6; box-sizing: border-box;" onkeydown="if(event.key==='Enter' && event.ctrlKey) window.confirmCustomPrompt();"></textarea>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button onclick="window.cancelCustomPrompt()" style="padding: 10px 22px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #94a3b8; cursor: pointer; font-size: 0.9rem; font-family: 'Readex Pro', sans-serif;">إلغاء</button>
+                <button onclick="window.confirmCustomPrompt()" style="padding: 10px 26px; background: linear-gradient(135deg, #ef4444, #b91c1c); border: none; border-radius: 10px; color: white; cursor: pointer; font-size: 0.9rem; font-weight: 600; font-family: 'Readex Pro', sans-serif; box-shadow: 0 4px 15px rgba(239,68,68,0.3);"><i class="fas fa-check" style="margin-left: 6px;"></i>تأكيد الإلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
 </html>
