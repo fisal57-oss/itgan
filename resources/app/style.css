@@ -84,20 +84,25 @@ body {
     border-left: 1px solid var(--glass-border);
     display: flex;
     flex-direction: column;
-    padding: 2.5rem 1.8rem;
+    padding: 1.2rem 1rem;
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
     z-index: 100;
     box-shadow: 15px 0 50px rgba(0, 0, 0, 0.8), 0 0 20px rgba(157, 80, 187, 0.05);
+    scrollbar-width: thin;
 }
 
 .logo {
     display: flex;
     align-items: center;
-    gap: 15px;
-    font-size: 1.8rem;
+    gap: 12px;
+    font-size: 1.4rem;
     font-weight: 800;
-    margin-bottom: 4rem;
+    margin-bottom: 1.2rem;
     color: var(--primary-light);
     letter-spacing: -1px;
+    flex-shrink: 0;
 }
 
 .logo i {
@@ -115,18 +120,41 @@ body {
 .nav-links {
     list-style: none;
     flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-left: 2px;
+    padding-right: 2px;
+    scrollbar-width: thin;
 }
 
-.nav-links li {
+.nav-links li:not(.nav-section-title) {
     display: flex;
     align-items: center;
-    gap: 15px;
-    padding: 12px 16px;
-    margin-bottom: 8px;
+    gap: 11px;
+    padding: 8px 12px;
+    margin-bottom: 3px;
     border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
     color: var(--text-muted);
+    font-size: 0.88rem;
+    font-weight: 500;
+}
+
+.nav-section-title {
+    padding: 8px 8px 4px !important;
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.5px !important;
+    list-style: none !important;
+    cursor: default !important;
+    user-select: none !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    margin-top: 6px !important;
+    margin-bottom: 3px !important;
 }
 
 .nav-links li:hover {

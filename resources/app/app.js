@@ -235,7 +235,7 @@ function loadState() {
     } catch (e) {
         console.error("Local Storage Load/Parse Error:", e);
     }
-    return JSON.parse(JSON.stringify(defaultState));
+    const fallback = JSON.parse(JSON.stringify(defaultState)); fallback.currentDate = new Date(); return fallback;
 }
 
 const state = loadState();
@@ -562,9 +562,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Navigation logic (Updated to include click listeners for dynamically added tabs if any, though handled by navLinks selector)
 function setupNavigation() {
+    navLinks = document.querySelectorAll('.nav-links li[data-view]');
     navLinks.forEach(link => {
         link.addEventListener('click', () => {
             const viewId = link.getAttribute('data-view');
+            if (!viewId) return;
             switchView(viewId);
             
             navLinks.forEach(l => l.classList.remove('active'));
@@ -574,7 +576,6 @@ function setupNavigation() {
 }
 
 function switchView(viewId) {
-    // Re-query if views list is empty or stale (defensive)
     if (!views || views.length === 0) {
         views = document.querySelectorAll('.view');
     }
@@ -1643,6 +1644,10 @@ function renderCalendar() {
     const monthYearTitle = document.getElementById('calendar-month-year');
     if (!grid || !monthYearTitle) return;
 
+    if (!state.currentDate || !(state.currentDate instanceof Date) || isNaN(state.currentDate.getTime())) {
+        state.currentDate = new Date();
+    }
+
     const year = state.currentDate.getFullYear();
     const month = state.currentDate.getMonth();
     
@@ -1655,7 +1660,7 @@ function renderCalendar() {
         const middleDate = new Date(year, month, 15);
         hijriMonthYear = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-uma-nu-latn', {month: 'long', year: 'numeric'}).format(middleDate);
     } catch(e) {
-        console.error("Hijri Header Error:", e);
+        console.error('Hijri Header Error:', e);
     }
 
     monthYearTitle.textContent = `${arabicMonths[month]} ${year} / ${hijriMonthYear}`;
@@ -1674,10 +1679,11 @@ function renderCalendar() {
 
     // Render empty slots 
     for (let i = 0; i < firstDay; i++) {
-        grid.innerHTML += `<div class="calendar-day empty"></div>`;
+        grid.innerHTML += '<div class="calendar-day empty"></div>';
     }
 
     // Render days
+    const bookings = Array.isArray(state.bookings) ? state.bookings : [];
     for (let i = 1; i <= daysInMonth; i++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
         const currentIterDate = new Date(year, month, i);
@@ -1687,34 +1693,23 @@ function renderCalendar() {
         try {
             hijriDay = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-uma-nu-latn', {day: 'numeric'}).format(currentIterDate);
         } catch(e) { 
-            hijriDay = i; // Fallback to Gregorian day if Hijri fails
+            hijriDay = i;
         }
         
-        // Find matching data and determine period status (Supports multi-day date ranges)
-        const dayBookings = state.bookings.filter(b => {
-            if (b.status === 'cancelled') return false;
-            const bStart = b.date;
-            const bEnd = b.endDate || b.date;
-            return dateStr >= bStart && dateStr <= bEnd;
-        });
-        const hasMorning = dayBookings.some(b => b.timePeriod === 'صباحاً');
-        const hasEvening = dayBookings.some(b => b.timePeriod === 'مساءً');
+        // Find matching data and determine period status
+        const dayBookings = bookings.filter(b => b && b.date === dateStr);
+        const hasMorning = dayBookings.some(b => b.timePeriod && (b.timePeriod.includes('صباح') || b.timePeriod === 'صباحاً'));
+        const hasEvening = dayBookings.some(b => b.timePeriod && (b.timePeriod.includes('مساء') || b.timePeriod === 'مساءً'));
         
         const isToday = dateStr === todayStr ? 'today' : '';
         
         let eventsHtml = '';
         if (hasMorning && hasEvening) {
-            eventsHtml = `<div class="cal-badge booking" style="background: linear-gradient(90deg, #4f46e5, #9333ea); color: white; justify-content: center;">
-                <i class="fas fa-clock"></i> محجوز (الفترتين)
-            </div>`;
+            eventsHtml = '<div class="cal-badge booking" style="background: linear-gradient(90deg, #4f46e5, #9333ea); color: white; justify-content: center;"><i class="fas fa-clock"></i> محجوز (الفترتين)</div>';
         } else if (hasMorning) {
-            eventsHtml = `<div class="cal-badge booking" style="background: rgba(79, 70, 229, 0.2); color: #818cf8; border-right: 4px solid #4f46e5;">
-                <i class="fas fa-sun"></i> محجوز صباحي
-            </div>`;
+            eventsHtml = '<div class="cal-badge booking" style="background: rgba(79, 70, 229, 0.2); color: #818cf8; border-right: 4px solid #4f46e5;"><i class="fas fa-sun"></i> محجوز صباحي</div>';
         } else if (hasEvening) {
-            eventsHtml = `<div class="cal-badge booking" style="background: rgba(147, 51, 234, 0.2); color: #c084fc; border-right: 4px solid #9333ea;">
-                <i class="fas fa-moon"></i> محجوز مسائي
-            </div>`;
+            eventsHtml = '<div class="cal-badge booking" style="background: rgba(147, 51, 234, 0.2); color: #c084fc; border-right: 4px solid #9333ea;"><i class="fas fa-moon"></i> محجوز مسائي</div>';
         }
 
         grid.innerHTML += `
@@ -1732,17 +1727,23 @@ function renderCalendar() {
 }
 
 window.prevMonth = () => {
+    if (!state.currentDate || !(state.currentDate instanceof Date) || isNaN(state.currentDate.getTime())) {
+        state.currentDate = new Date();
+    }
     state.currentDate.setMonth(state.currentDate.getMonth() - 1);
     renderCalendar();
 };
 
 window.nextMonth = () => {
+    if (!state.currentDate || !(state.currentDate instanceof Date) || isNaN(state.currentDate.getTime())) {
+        state.currentDate = new Date();
+    }
     state.currentDate.setMonth(state.currentDate.getMonth() + 1);
     renderCalendar();
 };
 
 window.goToToday = () => {
-    state.currentDate = new Date(); // Reset to OS current time
+    state.currentDate = new Date();
     renderCalendar();
 };
 

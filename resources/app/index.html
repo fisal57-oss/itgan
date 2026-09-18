@@ -29,7 +29,7 @@
                 <i class="fas fa-rocket"></i>
                 <span>إتقان</span>
             </div>
-            <ul class="nav-links">
+                        <ul class="nav-links">
                 <li class="active" data-view="dashboard">
                     <i class="fas fa-home"></i>
                     <span>الرئيسية</span>
@@ -42,21 +42,49 @@
                     <i class="fas fa-calendar-alt"></i>
                     <span>التقويم</span>
                 </li>
-                <li data-view="equipment">
-                    <i class="fas fa-tools"></i>
-                    <span>المعدات</span>
-                </li>
                 <li data-view="bookings-list">
                     <i class="fas fa-clipboard-list"></i>
                     <span>إدارة الحجوزات</span>
                 </li>
-                <li data-view="blacklist">
-                    <i class="fas fa-ban" style="color: #ef4444;"></i>
-                    <span>القائمة السوداء</span>
+                <li data-view="equipment">
+                    <i class="fas fa-tools"></i>
+                    <span>المعدات</span>
+                </li>
+
+                <!-- قسم منظومة المسرح والخدمات الذكية -->
+                <li class="nav-section-title" style="color: #38bdf8;">
+                    <i class="fas fa-masks-theater"></i>
+                    <span>منظومة المسرح والخدمات الذكية</span>
+                </li>
+                <li data-view="theater-seats" style="background: rgba(0, 210, 255, 0.08); border: 1px solid rgba(0, 210, 255, 0.2);">
+                    <i class="fas fa-chair" style="color: #00d2ff;"></i>
+                    <span>مقاعد المسرح والـ QR</span>
+                </li>
+                <li data-view="digital-form" style="background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.2);">
+                    <i class="fas fa-file-signature" style="color: #c084fc;"></i>
+                    <span>استمارة طلب الحجز</span>
+                </li>
+                <li data-view="beneficiary-portal" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2);">
+                    <i class="fas fa-users" style="color: #34d399;"></i>
+                    <span>بوابة المستفيد والضيوف</span>
+                </li>
+                <li data-view="staff-portal" style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2);">
+                    <i class="fas fa-user-shield" style="color: #fbbf24;"></i>
+                    <span>بوابة المنظم ومسح الباب</span>
+                </li>
+
+                <!-- قسم التقارير والنظام -->
+                <li class="nav-section-title" style="color: #94a3b8;">
+                    <i class="fas fa-sliders-h"></i>
+                    <span>النظام والتقارير</span>
                 </li>
                 <li data-view="reports">
                     <i class="fas fa-chart-pie"></i>
                     <span>التقارير التحليلية</span>
+                </li>
+                <li data-view="blacklist">
+                    <i class="fas fa-ban" style="color: #ef4444;"></i>
+                    <span>القائمة السوداء</span>
                 </li>
                 <li data-view="maintenance">
                     <i class="fas fa-microchip"></i>
@@ -65,18 +93,6 @@
                 <li data-view="settings">
                     <i class="fas fa-cog"></i>
                     <span>الإعدادات العامة</span>
-                </li>
-                <li data-view="theater-seats" style="border-top: 1px solid rgba(255,255,255,0.08); margin-top: 8px; padding-top: 10px;">
-                    <i class="fas fa-chair" style="color: #00d2ff;"></i>
-                    <span>مقاعد المسرح والـ QR</span>
-                </li>
-                <li data-view="digital-form">
-                    <i class="fas fa-file-signature" style="color: #a855f7;"></i>
-                    <span>النموذج الرقمي للحجز</span>
-                </li>
-                <li data-view="staff-portal">
-                    <i class="fas fa-user-shield" style="color: #e5a638;"></i>
-                    <span>بوابة المنظم وموظف الباب</span>
                 </li>
             </ul>
             <div class="sidebar-footer">
@@ -679,7 +695,28 @@
                 </section>
 
                 <!-- Staff & Organizer Door Portal View -->
-                <section id="staff-portal-view" class="view" style="display: none; height: calc(100vh - 120px); padding: 0;">
+                
+                  <!-- Beneficiary Portal View -->
+                  <section id="beneficiary-portal-view" class="view" style="display: none; height: calc(100vh - 120px); padding: 0;">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 5px;">
+                          <div>
+                              <h2 style="font-size: 1.25rem; font-weight: 700; color: #34d399; margin: 0;"><i class="fas fa-users" style="margin-left: 8px;"></i>بوابة المستفيد والضيوف</h2>
+                              <p style="color: var(--text-muted); font-size: 0.8rem; margin: 4px 0 0 0;">استعراض الفعاليات، حجز المقاعد الفورية، وتحميل بطاقات الحضور الرقمية</p>
+                          </div>
+                          <div style="display: flex; gap: 10px;">
+                              <button class="btn-secondary" onclick="window.open('beneficiary.html', '_blank')" style="border-radius: 10px; padding: 7px 14px; font-size: 0.85rem;">
+                                  <i class="fas fa-external-link-alt" style="margin-left: 6px;"></i> فتح كنافذة منفصلة
+                              </button>
+                              <button class="btn-primary" onclick="document.getElementById('beneficiary-portal-iframe').contentWindow.location.reload()" style="border-radius: 10px; padding: 7px 14px; font-size: 0.85rem;">
+                                  <i class="fas fa-sync" style="margin-left: 6px;"></i> تحديث
+                              </button>
+                          </div>
+                      </div>
+                      <div class="glass-card" style="height: calc(100% - 60px); border-radius: 16px; overflow: hidden; padding: 0; border: 1px solid var(--glass-border);">
+                          <iframe id="beneficiary-portal-iframe" src="beneficiary.html" style="width: 100%; height: 100%; border: none; background: #060D1A;"></iframe>
+                      </div>
+                  </section>
+                  <section id="staff-portal-view" class="view" style="display: none; height: calc(100vh - 120px); padding: 0;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 5px;">
                         <div>
                             <h2 style="font-size: 1.25rem; font-weight: 700; color: #fbbf24; margin: 0;"><i class="fas fa-user-shield" style="margin-left: 8px;"></i>بوابة المنظم وموظف الباب</h2>
