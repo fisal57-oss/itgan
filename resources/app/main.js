@@ -19,15 +19,14 @@ function createWindow() {
             devTools: true 
         },
         backgroundColor: '#0f172a',
-        show: false
+        show: true
     });
 
     Menu.setApplicationMenu(null);
-    win.loadFile('index.html');
+    win.loadFile(path.join(__dirname, 'index.html'));
 
     win.once('ready-to-show', () => {
         win.maximize();
-        win.show();
     });
 }
 
