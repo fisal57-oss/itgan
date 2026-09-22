@@ -5282,3 +5282,125 @@ window.handleBlacklistTypeChange = function(type) {
         valInput.value = type === 'entity' ? window.pendingBlacklistEntity : window.pendingBlacklistCoordinator;
     }
 };
+
+// ==========================================================================
+// Admin Authentication Portal Logic (نظام تسجيل الدخول والحماية الذكي)
+// ==========================================================================
+
+window.initItqanAuth = function() {
+    const overlay = document.getElementById('itqan-auth-overlay');
+    if (!overlay) return;
+
+    // Check saved session
+    const isAuthed = localStorage.getItem('itqan_auth_token') === 'true' || 
+                     sessionStorage.getItem('itqan_auth_token') === 'true';
+
+    // Sync organization name in auth card
+    const orgNameEl = document.getElementById('auth-org-name');
+    if (orgNameEl && typeof state !== 'undefined' && state.appSettings && state.appSettings.orgName) {
+        orgNameEl.textContent = state.appSettings.orgName;
+    }
+
+    if (isAuthed) {
+        overlay.classList.add('hidden');
+    } else {
+        overlay.classList.remove('hidden');
+    }
+};
+
+window.toggleAuthPasswordVisibility = function() {
+    const pwdInput = document.getElementById('auth-password');
+    const eyeIcon = document.getElementById('auth-eye-icon');
+    if (!pwdInput || !eyeIcon) return;
+
+    if (pwdInput.type === 'password') {
+        pwdInput.type = 'text';
+        eyeIcon.classList.remove('fa-eye');
+        eyeIcon.classList.add('fa-eye-slash');
+    } else {
+        pwdInput.type = 'password';
+        eyeIcon.classList.remove('fa-eye-slash');
+        eyeIcon.classList.add('fa-eye');
+    }
+};
+
+window.handleItqanLogin = function(event) {
+    if (event) event.preventDefault();
+
+    const usernameInput = document.getElementById('auth-username');
+    const pwdInput = document.getElementById('auth-password');
+    const rememberMe = document.getElementById('auth-remember-me');
+    const overlay = document.getElementById('itqan-auth-overlay');
+    const card = document.getElementById('itqan-auth-card');
+
+    const username = (usernameInput ? usernameInput.value : '').trim().toLowerCase();
+    const password = (pwdInput ? pwdInput.value : '').trim();
+
+    // Valid credentials: (admin & admin123) OR (PIN 5050)
+    const isValid = (username === 'admin' && password === 'admin123') || 
+                    (password === '5050') || 
+                    (username === 'admin' && password === '5050');
+
+    if (isValid) {
+        if (rememberMe && rememberMe.checked) {
+            localStorage.setItem('itqan_auth_token', 'true');
+        } else {
+            sessionStorage.setItem('itqan_auth_token', 'true');
+        }
+
+        if (overlay) overlay.classList.add('hidden');
+        if (typeof showToast === 'function') {
+            showToast('✅ مرحباً بك! تم تسجيل الدخول إلى لوحة التحكم بنجاح', 'success');
+        }
+    } else {
+        if (card) {
+            card.classList.add('auth-shake');
+            setTimeout(() => card.classList.remove('auth-shake'), 450);
+        }
+        if (typeof showToast === 'function') {
+            showToast('⚠️ اسم المستخدم أو كلمة المرور غير صحيحة (الافتراضي: admin / admin123)', 'danger');
+        } else {
+            alert('اسم المستخدم أو كلمة المرور غير صحيحة!');
+        }
+    }
+};
+
+window.handleQuickPinLogin = function() {
+    const usernameInput = document.getElementById('auth-username');
+    const pwdInput = document.getElementById('auth-password');
+    const rememberMe = document.getElementById('auth-remember-me');
+    const overlay = document.getElementById('itqan-auth-overlay');
+
+    if (usernameInput) usernameInput.value = 'admin';
+    if (pwdInput) pwdInput.value = '5050';
+    if (rememberMe) rememberMe.checked = true;
+
+    localStorage.setItem('itqan_auth_token', 'true');
+    if (overlay) overlay.classList.add('hidden');
+
+    if (typeof showToast === 'function') {
+        showToast('⚡ مرحباً بك! تم الدخول الفوري السريع للمدير (رمز PIN)', 'success');
+    }
+};
+
+window.handleItqanLogout = function() {
+    if (!confirm('هل أنت متأكد من تسجيل الخروج من لوحة التحكم؟')) return;
+
+    localStorage.removeItem('itqan_auth_token');
+    sessionStorage.removeItem('itqan_auth_token');
+
+    const overlay = document.getElementById('itqan-auth-overlay');
+    const pwdInput = document.getElementById('auth-password');
+    if (pwdInput) pwdInput.value = '';
+
+    if (overlay) overlay.classList.remove('hidden');
+
+    if (typeof showToast === 'function') {
+        showToast('👋 تم تسجيل الخروج بنجاح', 'info');
+    }
+};
+
+// Initialize auth check when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(window.initItqanAuth, 50);
+});

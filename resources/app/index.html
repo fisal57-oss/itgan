@@ -22,6 +22,85 @@
     <!-- Global Print Area (Strictly for physical print isolation) -->
     <div id="global-print-area"></div>
 
+    <!-- Admin Authentication Modal Overlay -->
+    <div id="itqan-auth-overlay" class="auth-overlay">
+        <div class="auth-card" id="itqan-auth-card">
+            <!-- Top Branding Header -->
+            <div class="auth-brand-header">
+                <div class="auth-logo-badge">
+                    <i class="fas fa-sun fa-spin" style="--fa-animation-duration: 25s; color: #00d2ff;"></i>
+                </div>
+                <div class="auth-brand-text">
+                    <div class="auth-org-title">
+                        <i class="fas fa-crown" style="color: #fbbf24;"></i>
+                        <span id="auth-org-name">الإدارة العامة للتعليم بمنطقة عسير</span>
+                    </div>
+                    <div class="auth-system-title">نظام إتقان لإدارة الموارد والمسارح والقاعات</div>
+                </div>
+            </div>
+
+            <!-- Glowing Padlock Box -->
+            <div class="auth-lock-icon-wrapper">
+                <div class="auth-lock-box">
+                    <i class="fas fa-lock"></i>
+                </div>
+            </div>
+
+            <div class="auth-heading-group">
+                <h2 class="auth-title">تسجيل دخول الإدارة</h2>
+                <p class="auth-subtitle">أدخل اسم المستخدم وكلمة المرور للوصول إلى لوحة التحكم</p>
+            </div>
+
+            <form id="itqan-login-form" onsubmit="handleItqanLogin(event)">
+                <!-- Username -->
+                <div class="auth-form-group">
+                    <label class="auth-label">اسم المستخدم</label>
+                    <div class="auth-input-wrapper">
+                        <i class="fas fa-user auth-field-icon"></i>
+                        <input type="text" id="auth-username" class="auth-input" placeholder="أدخل اسم المستخدم (الافتراضي: admin)" required autocomplete="username">
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div class="auth-form-group">
+                    <label class="auth-label">كلمة المرور</label>
+                    <div class="auth-input-wrapper">
+                        <i class="fas fa-lock auth-field-icon"></i>
+                        <input type="password" id="auth-password" class="auth-input" placeholder="أدخل كلمة المرور (الافتراضي: admin123)" required autocomplete="current-password">
+                        <button type="button" class="auth-toggle-pwd" onclick="toggleAuthPasswordVisibility()" tabindex="-1" title="إظهار / إخفاء">
+                            <i class="fas fa-eye" id="auth-eye-icon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="auth-options-row">
+                    <span class="auth-creds-hint">admin / admin123</span>
+                    <label class="auth-remember-label">
+                        <span>تذكر تسجيل الدخول</span>
+                        <input type="checkbox" id="auth-remember-me" checked>
+                    </label>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="auth-submit-btn">
+                    <span>دخول لوحة التحكم</span>
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+
+                <!-- Quick PIN Button -->
+                <button type="button" class="auth-pin-btn" onclick="handleQuickPinLogin()">
+                    <i class="fas fa-bolt" style="color: #fbbf24;"></i>
+                    <span>دخول فوري مباشر للمدير (رمز PIN: 5050)</span>
+                    <i class="fas fa-crown" style="color: #fbbf24;"></i>
+                </button>
+            </form>
+
+            <div class="auth-footer-note">
+                نظام إدارة وحجز الموارد والمسارح الذكي © 2026
+            </div>
+        </div>
+    </div>
+
     <div class="app-container">
         <!-- Sidebar Navigation -->
         <nav class="sidebar">
@@ -71,9 +150,12 @@
                     <span>فتح النموذج الرقمي</span>
                 </li>
             </ul>
-            <div class="sidebar-footer">
-                <button id="theme-toggle">
+            <div class="sidebar-footer" style="display: flex; gap: 10px; align-items: center; justify-content: space-between;">
+                <button id="theme-toggle" title="تغيير المظهر">
                     <i class="fas fa-moon"></i>
+                </button>
+                <button id="auth-logout-btn" onclick="handleItqanLogout()" title="تسجيل الخروج" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.2)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.1)'">
+                    <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>
         </nav>
