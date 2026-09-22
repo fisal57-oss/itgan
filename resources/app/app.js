@@ -213,7 +213,12 @@ function loadState() {
             if (!Array.isArray(newState.equipment)) newState.equipment = defaultState.equipment;
 
             // Date objects need to be re-instantiated
-            newState.currentDate = new Date(newState.currentDate || new Date());
+            if (newState.currentDate) {
+                newState.currentDate = new Date(newState.currentDate);
+                if (isNaN(newState.currentDate.getTime())) newState.currentDate = new Date();
+            } else {
+                newState.currentDate = new Date();
+            }
             newState.bookingsSortCriteria = newState.bookingsSortCriteria || 'priority';
             newState.bookingsStatusFilter = newState.bookingsStatusFilter || 'all';
             newState.bookingsDateFilter = newState.bookingsDateFilter || 'all';
@@ -225,7 +230,9 @@ function loadState() {
     } catch (e) {
         console.error("Local Storage Load/Parse Error:", e);
     }
-    return JSON.parse(JSON.stringify(defaultState));
+    const fallback = JSON.parse(JSON.stringify(defaultState));
+    fallback.currentDate = new Date();
+    return fallback;
 }
 
 const state = loadState();
@@ -1223,6 +1230,10 @@ function renderCalendar() {
     const monthYearTitle = document.getElementById('calendar-month-year');
     if (!grid || !monthYearTitle) return;
 
+    if (!state.currentDate || !(state.currentDate instanceof Date) || isNaN(state.currentDate.getTime())) {
+        state.currentDate = new Date();
+    }
+
     const year = state.currentDate.getFullYear();
     const month = state.currentDate.getMonth();
     
@@ -1258,6 +1269,7 @@ function renderCalendar() {
     }
 
     // Render days
+    const bookings = Array.isArray(state.bookings) ? state.bookings : [];
     for (let i = 1; i <= daysInMonth; i++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
         const currentIterDate = new Date(year, month, i);
@@ -1271,9 +1283,14 @@ function renderCalendar() {
         }
         
         // Find matching data and determine period status
-        const dayBookings = state.bookings.filter(b => b.date === dateStr);
-        const hasMorning = dayBookings.some(b => b.timePeriod === 'صباحاً');
-        const hasEvening = dayBookings.some(b => b.timePeriod === 'مساءً');
+        const dayBookings = bookings.filter(b => {
+            if (!b || b.status === 'cancelled') return false;
+            const bStart = b.date;
+            const bEnd = b.endDate || b.date;
+            return dateStr >= bStart && dateStr <= bEnd;
+        });
+        const hasMorning = dayBookings.some(b => b.timePeriod && (b.timePeriod.includes('صباح') || b.timePeriod === 'صباحاً'));
+        const hasEvening = dayBookings.some(b => b.timePeriod && (b.timePeriod.includes('مساء') || b.timePeriod === 'مساءً'));
         
         const isToday = dateStr === todayStr ? 'today' : '';
         
@@ -1307,17 +1324,23 @@ function renderCalendar() {
 }
 
 window.prevMonth = () => {
+    if (!state.currentDate || !(state.currentDate instanceof Date) || isNaN(state.currentDate.getTime())) {
+        state.currentDate = new Date();
+    }
     state.currentDate.setMonth(state.currentDate.getMonth() - 1);
     renderCalendar();
 };
 
 window.nextMonth = () => {
+    if (!state.currentDate || !(state.currentDate instanceof Date) || isNaN(state.currentDate.getTime())) {
+        state.currentDate = new Date();
+    }
     state.currentDate.setMonth(state.currentDate.getMonth() + 1);
     renderCalendar();
 };
 
 window.goToToday = () => {
-    state.currentDate = new Date(); // Reset to OS current time
+    state.currentDate = new Date();
     renderCalendar();
 };
 
