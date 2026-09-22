@@ -89,13 +89,11 @@ ipcMain.handle('export-form', async () => {
     return { success: false };
 });
 
-ipcMain.handle('sync-digital-form', async (event, payload) => {
+ipcMain.handle('sync-digital-form', async (event, rooms) => {
     try {
-        const rooms = Array.isArray(payload) ? payload : (payload && payload.rooms ? payload.rooms : []);
         const locations = [
             path.join(__dirname, 'booking_form_digital.html'),
-            path.join(__dirname, 'انجاز', 'booking_form_digital.html'),
-            path.join(__dirname, 'dist', 'ItqanApp-win32-x64', 'resources', 'app', 'booking_form_digital.html')
+            path.join(__dirname, 'انجاز', 'booking_form_digital.html')
         ];
 
         const roomsHtml = rooms.map(r => 

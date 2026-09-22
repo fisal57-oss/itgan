@@ -1,17 +1,16 @@
 {
   "name": "itqan-resource-management",
-  "version": "2.0.0",
-  "description": "نظام إتقان المطور v2.0 - إدارة الموارد والمسارح والفعاليات",
+  "version": "1.0.0",
+  "description": "نظام إتقان لإدارة الموارد والفعاليات",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "web": "node server.js",
     "build-win": "electron-packager . ItqanApp --platform=win32 --arch=x64 --out=dist --overwrite",
     "dist": "electron-builder --win"
   },
   "build": {
     "appId": "com.itqan.management",
-    "productName": "نظام إتقان المطور v2.0",
+    "productName": "Injaz System",
     "directories": {
       "output": "dist/installer"
     },
