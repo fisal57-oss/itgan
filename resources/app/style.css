@@ -73,11 +73,14 @@ body {
     display: flex;
     height: 100vh;
     width: 100vw;
+    overflow: hidden;
 }
 
 /* Sidebar Styling */
 .sidebar {
     width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    flex-shrink: 0;
     background: rgba(15, 23, 42, 0.85);
     backdrop-filter: blur(40px) saturate(180%);
     -webkit-backdrop-filter: blur(40px) saturate(180%);
@@ -150,7 +153,8 @@ body {
 
 /* Main Content Styling */
 .main-content {
-    flex-grow: 1;
+    flex: 1 1 auto;
+    min-width: 0;
     height: 100vh;
     overflow-y: auto;
     background: radial-gradient(circle at top left, #1e293b 0%, #0f172a 100%);

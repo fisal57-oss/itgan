@@ -225,6 +225,12 @@ function loadState() {
             newState.bookingsStartDate = newState.bookingsStartDate || '';
             newState.bookingsEndDate = newState.bookingsEndDate || '';
             
+            // Ensure valid currentView
+            const validViews = ['dashboard', 'rooms', 'calendar', 'equipment', 'bookings-list', 'blacklist', 'reports', 'maintenance', 'settings'];
+            if (!newState.currentView || !validViews.includes(newState.currentView)) {
+                newState.currentView = 'dashboard';
+            }
+
             return newState;
         }
     } catch (e) {
@@ -232,6 +238,7 @@ function loadState() {
     }
     const fallback = JSON.parse(JSON.stringify(defaultState));
     fallback.currentDate = new Date();
+    fallback.currentView = 'dashboard';
     return fallback;
 }
 
@@ -245,7 +252,7 @@ const roomGridMini = document.querySelector('.room-grid-mini');
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     setupNavigation();
-    renderDashboard();
+    switchView(state.currentView || 'dashboard');
     applySystemBranding();
     syncSettingsUI();
     updateStampPreview();
@@ -259,6 +266,7 @@ function setupNavigation() {
     navLinks.forEach(link => {
         link.addEventListener('click', () => {
             const viewId = link.getAttribute('data-view');
+            if (!viewId) return; // Prevent navigation break for actions like opening digital form
             switchView(viewId);
             
             navLinks.forEach(l => l.classList.remove('active'));
@@ -268,6 +276,11 @@ function setupNavigation() {
 }
 
 function switchView(viewId) {
+    const validViews = ['dashboard', 'rooms', 'calendar', 'equipment', 'bookings-list', 'blacklist', 'reports', 'maintenance', 'settings'];
+    if (!viewId || !validViews.includes(viewId) || !document.getElementById(`${viewId}-view`)) {
+        viewId = 'dashboard';
+    }
+
     // Re-query if views list is empty or stale (defensive)
     if (!views || views.length === 0) {
         views = document.querySelectorAll('.view');
@@ -292,6 +305,7 @@ function switchView(viewId) {
     });
 
     state.currentView = viewId;
+    saveState();
     
     // Render content based on view
     if (viewId === 'dashboard') {
