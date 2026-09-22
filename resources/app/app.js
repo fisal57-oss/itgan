@@ -1,3 +1,67 @@
+// Browser Polyfill for running as a Standalone Web App
+if (!window.electronAPI) {
+    window.electronAPI = {
+        syncDigitalForm: async (data) => {
+            try {
+                localStorage.setItem('itqan_synced_rooms', JSON.stringify(data.rooms));
+            } catch (e) {}
+            return { success: true };
+        },
+        updateTitle: (title) => {
+            document.title = title;
+        },
+        openExternal: (url) => {
+            window.open(url, '_blank');
+        },
+        backupProject: async () => {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", `itqan_backup_${new Date().toISOString().split('T')[0]}.json`);
+            dlAnchorElem.click();
+            return { success: true, name: `itqan_backup_${new Date().toISOString().split('T')[0]}.json`, path: 'مجلد التنزيلات (Downloads)' };
+        },
+        exportData: async (data) => {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", `itqan_data_${new Date().toISOString().split('T')[0]}.json`);
+            dlAnchorElem.click();
+            return { success: true, path: 'مجلد التنزيلات (Downloads)' };
+        },
+        importData: () => {
+            return new Promise((resolve) => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return resolve({ error: 'لم يتم اختيار ملف' });
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        try {
+                            const data = JSON.parse(event.target.result);
+                            resolve({ success: true, data });
+                        } catch (err) {
+                            resolve({ error: 'صيغة الملف غير صحيحة' });
+                        }
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
+            });
+        },
+        exportForm: async () => {
+            const a = document.createElement('a');
+            a.href = 'booking_form_digital.html';
+            a.download = 'Booking_Form_Digital.html';
+            a.click();
+            return { success: true, path: 'مجلد التنزيلات (Downloads)' };
+        },
+        openPath: () => {}
+    };
+}
+
 // Default State (Demo Data)
 const defaultState = {
     currentView: 'dashboard',
